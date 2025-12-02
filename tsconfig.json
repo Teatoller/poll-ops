@@ -1,7 +1,16 @@
 {
   "files": [],
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ],
+  "compilerOptions": {
+    // Remove or set to false:
+    "verbatimModuleSyntax": false,
+    // OR keep it and ensure all type imports use 'import type'
+  }
 }
