@@ -15,16 +15,17 @@ const AdminLogin = () => {
   
   const from = location.state?.from?.pathname || '/admin/dashboard';
 
-  const handleSubmit = async (e) => {
+   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
+  
     try {
       await adminLogin(email, password);
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to login. Please check your credentials.');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to login. Please check your credentials.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

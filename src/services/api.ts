@@ -138,16 +138,30 @@ export const adminAPI = {
     return adminApiFetch(`/admin/polls/${pollId}/results`);
   },
 
-  updatePoll: async (pollId: number, pollData: Partial<{
+  // UPDATE poll with candidates support - ENHANCE existing method
+  updatePoll: async (pollId: number, pollData: {
     officeName: string;
     description: string;
     startDate: string;
     endDate: string;
-    is_active: boolean;
-  }>) => {
+    is_active?: boolean;
+    candidates?: Array<{
+      id?: number;
+      name: string;
+      party: string;
+      photoUrl?: string;
+      description?: string;
+    }>;
+  }): Promise<{ message: string; pollId: number }> => {
     return adminApiFetch(`/admin/polls/${pollId}`, {
       method: 'PUT',
       body: JSON.stringify(pollData),
+    });
+  },
+
+  deletePoll: async (pollId: number): Promise<{ message: string }> => {
+    return adminApiFetch(`/admin/polls/${pollId}`, {
+      method: 'DELETE',
     });
   },
 
@@ -362,6 +376,23 @@ export const api = {
 
   deleteUsers: async (userIds: number[]): Promise<{ message: string }> => {
     return adminAPI.deleteUsers(userIds);
+  },
+
+  // In the api object, add this if it doesn't exist:
+  updatePoll: async (pollId: number, pollData: any): Promise<any> => {
+    return adminAPI.updatePoll(pollId, pollData);
+  },
+
+  // Toggle poll active status - MISSING
+  togglePollActive: async (pollId: number, isActive: boolean): Promise<any> => {
+    // Note: The backend endpoint doesn't need the isActive parameter
+    // It toggles whatever the current state is
+    return adminAPI.togglePollStatus(pollId);
+  },
+
+  // Delete poll - MISSING
+  deletePoll: async (pollId: number): Promise<{ message: string }> => {
+    return adminAPI.deletePoll(pollId);
   },
 };
 

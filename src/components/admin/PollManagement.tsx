@@ -1,6 +1,10 @@
-// src/components/admin/PollManagement.tsx
+// src/components/admin/PollManagement.tsx - UPDATED
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+// import CreatePollModal from './CreatePollModal'; // Make sure this exists
+import EditPollModal from './EditPollModal';
+import CreatePollModal from './CreatePollModal';
+import '../../styles/pollManagement.css';
 
 interface Poll {
   id: number;
@@ -9,12 +13,14 @@ interface Poll {
   startDate: string;
   endDate: string;
   is_active: boolean;
-  totalVotes: number;
-  candidateCount: number;
+  totalVotes?: number; // Make optional
+  candidateCount?: number; // Make optional
   candidates: Array<{
     id: number;
     name: string;
     party: string;
+    photoUrl?: string;
+    description?: string;
   }>;
 }
 
@@ -23,6 +29,7 @@ const PollManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingPoll, setEditingPoll] = useState<Poll | null>(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchPolls();
@@ -30,9 +37,21 @@ const PollManagement: React.FC = () => {
 
   const fetchPolls = async () => {
     try {
+      setError('');
       const data = await api.getAdminPolls();
-      setPolls(data);
-    } catch (error) {
+      console.log("dddtaaaa fetchPolls--->", data)
+      // Transform data if needed
+            const transformedPolls = data.map((poll: any) => ({
+        ...poll,
+        totalVotes: poll.total_votes || poll.totalVotes || 0,
+        candidateCount: poll.candidate_count || poll.candidateCount || poll.candidates?.length || 0,
+        officeName: poll.office_name || poll.officeName,
+        is_active: poll.is_active !== undefined ? poll.is_active : true,
+        candidates: poll.candidates || [] // <- ensure candidates is an array
+      }));
+      setPolls(transformedPolls);
+    } catch (error: any) {
+      setError(error.message || 'Failed to fetch polls');
       console.error('Error fetching polls:', error);
     } finally {
       setLoading(false);
@@ -41,37 +60,60 @@ const PollManagement: React.FC = () => {
 
   const handleCreatePoll = async (pollData: any) => {
     try {
+      setError('');
       await api.createPoll(pollData);
       fetchPolls();
       setShowCreateModal(false);
-    } catch (error) {
+    } catch (error: any) {
+      setError(error.message || 'Failed to create poll');
       console.error('Error creating poll:', error);
     }
   };
 
   const handleToggleActive = async (pollId: number, isActive: boolean) => {
     try {
-      // You'll need to add this endpoint
+      setError('');
       await api.togglePollActive(pollId, !isActive);
       fetchPolls();
-    } catch (error) {
+    } catch (error: any) {
+      setError(error.message || 'Failed to toggle poll status');
       console.error('Error toggling poll:', error);
     }
   };
 
   const handleDeletePoll = async (pollId: number) => {
-    if (window.confirm('Are you sure you want to delete this poll?')) {
+    if (window.confirm('Are you sure you want to delete this poll? This action cannot be undone.')) {
       try {
-        // You'll need to add this endpoint
+        setError('');
         await api.deletePoll(pollId);
         fetchPolls();
-      } catch (error) {
+      } catch (error: any) {
+        setError(error.message || 'Failed to delete poll');
         console.error('Error deleting poll:', error);
       }
     }
   };
 
-  if (loading) return <div>Loading polls...</div>;
+  const handleUpdatePoll = async (updatedPoll: any) => {
+    if (!editingPoll) return;
+    
+    try {
+      setError('');
+      await api.updatePoll(editingPoll.id, updatedPoll);
+      setEditingPoll(null);
+      fetchPolls();
+    } catch (error: any) {
+      setError(error.message || 'Failed to update poll');
+      console.error('Error updating poll:', error);
+    }
+  };
+
+  if (loading) return (
+    <div className="loading-container">
+      <div className="spinner"></div>
+      <p>Loading polls...</p>
+    </div>
+  );
 
   return (
     <div className="poll-management">
@@ -84,6 +126,12 @@ const PollManagement: React.FC = () => {
           + Create New Poll
         </button>
       </div>
+
+      {error && (
+        <div className="alert alert-error">
+          {error}
+        </div>
+      )}
 
       <div className="polls-table-container">
         <table className="polls-table">
@@ -105,11 +153,15 @@ const PollManagement: React.FC = () => {
               <tr key={poll.id}>
                 <td>#{poll.id}</td>
                 <td>{poll.officeName}</td>
-                <td>{poll.description}</td>
+                <td className="description-cell">
+                  {poll.description.length > 50 
+                    ? `${poll.description.substring(0, 50)}...` 
+                    : poll.description}
+                </td>
                 <td>{new Date(poll.startDate).toLocaleDateString()}</td>
                 <td>{new Date(poll.endDate).toLocaleDateString()}</td>
-                <td>{poll.candidateCount}</td>
-                <td>{poll.totalVotes.toLocaleString()}</td>
+                <td>{poll.candidateCount || poll.candidates?.length || 0}</td>
+                <td>{(poll.totalVotes || 0).toLocaleString()}</td>
                 <td>
                   <span className={`status-badge ${poll.is_active ? 'status-active' : 'status-inactive'}`}>
                     {poll.is_active ? 'Active' : 'Inactive'}
@@ -120,25 +172,41 @@ const PollManagement: React.FC = () => {
                     <button 
                       onClick={() => setEditingPoll(poll)}
                       className="btn-action btn-edit"
+                      title="Edit poll"
                     >
                       Edit
                     </button>
                     <button 
                       onClick={() => handleToggleActive(poll.id, poll.is_active)}
-                      className="btn-action btn-toggle"
+                      className={`btn-action ${poll.is_active ? 'btn-deactivate' : 'btn-activate'}`}
+                      title={poll.is_active ? 'Deactivate poll' : 'Activate poll'}
                     >
                       {poll.is_active ? 'Deactivate' : 'Activate'}
                     </button>
                     <button 
                       onClick={() => handleDeletePoll(poll.id)}
                       className="btn-action btn-delete"
+                      title="Delete poll"
+                      disabled={(poll.totalVotes || 0) > 0}
                     >
                       Delete
                     </button>
                   </div>
+                  {(poll.totalVotes || 0) > 0 && (
+                    <div className="delete-hint">
+                      Cannot delete poll with votes
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
+            {polls.length === 0 && (
+              <tr>
+                <td colSpan={9} className="no-data">
+                  No polls found. Create your first poll!
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -154,148 +222,9 @@ const PollManagement: React.FC = () => {
         <EditPollModal
           poll={editingPoll}
           onClose={() => setEditingPoll(null)}
-          onSave={(updatedPoll) => {
-            // Implement update logic
-            setEditingPoll(null);
-            fetchPolls();
-          }}
+          onSave={handleUpdatePoll}
         />
       )}
-    </div>
-  );
-};
-
-// src/components/admin/CreatePollModal.tsx
-const CreatePollModal: React.FC<{ onClose: () => void; onSubmit: (data: any) => void }> = ({ onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    officeName: '',
-    description: '',
-    startDate: '',
-    endDate: '',
-    candidates: [{ name: '', party: '' }]
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
-
-  const addCandidate = () => {
-    setFormData(prev => ({
-      ...prev,
-      candidates: [...prev.candidates, { name: '', party: '' }]
-    }));
-  };
-
-  const removeCandidate = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      candidates: prev.candidates.filter((_, i) => i !== index)
-    }));
-  };
-
-  const updateCandidate = (index: number, field: 'name' | 'party', value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      candidates: prev.candidates.map((candidate, i) => 
-        i === index ? { ...candidate, [field]: value } : candidate
-      )
-    }));
-  };
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h3>Create New Poll</h3>
-          <button onClick={onClose} className="modal-close">×</button>
-        </div>
-        
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Office Name *</label>
-            <input
-              type="text"
-              value={formData.officeName}
-              onChange={(e) => setFormData(prev => ({ ...prev, officeName: e.target.value }))}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              rows={3}
-            />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label>Start Date *</label>
-              <input
-                type="datetime-local"
-                value={formData.startDate}
-                onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>End Date *</label>
-              <input
-                type="datetime-local"
-                value={formData.endDate}
-                onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>Candidates *</label>
-            {formData.candidates.map((candidate, index) => (
-              <div key={index} className="candidate-input-group">
-                <input
-                  type="text"
-                  placeholder="Candidate Name"
-                  value={candidate.name}
-                  onChange={(e) => updateCandidate(index, 'name', e.target.value)}
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="Party"
-                  value={candidate.party}
-                  onChange={(e) => updateCandidate(index, 'party', e.target.value)}
-                  required
-                />
-                {formData.candidates.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeCandidate(index)}
-                    className="btn-remove"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-            <button type="button" onClick={addCandidate} className="btn-add">
-              + Add Candidate
-            </button>
-          </div>
-
-          <div className="modal-actions">
-            <button type="button" onClick={onClose} className="btn-secondary">
-              Cancel
-            </button>
-            <button type="submit" className="btn-primary">
-              Create Poll
-            </button>
-          </div>
-        </form>
-      </div>
     </div>
   );
 };
