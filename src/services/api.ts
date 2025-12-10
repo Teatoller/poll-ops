@@ -134,6 +134,11 @@ export const adminAPI = {
     return adminApiFetch(`/admin/polls${detailed ? '?detailed=true' : ''}`);
   },
 
+  // In adminAPI object, add this method:
+  getPoll: async (pollId: number): Promise<Poll> => {
+    return adminApiFetch(`/admin/polls/${pollId}`);
+  },
+
   getPollDetails: async (pollId: number) => {
     return adminApiFetch(`/admin/polls/${pollId}/results`);
   },
@@ -360,6 +365,10 @@ export const api = {
 
   getAdminPolls: async () => {
     return adminAPI.getPolls();
+  },
+
+  getPoll: async (pollId: number): Promise<Poll> => {
+    return adminAPI.getPoll(pollId);
   },
 
   // Statistics function for backward compatibility

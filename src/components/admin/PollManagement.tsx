@@ -39,7 +39,6 @@ const PollManagement: React.FC = () => {
     try {
       setError('');
       const data = await api.getAdminPolls();
-      console.log("dddtaaaa fetchPolls--->", data)
       // Transform data if needed
             const transformedPolls = data.map((poll: any) => ({
         ...poll,
@@ -47,7 +46,7 @@ const PollManagement: React.FC = () => {
         candidateCount: poll.candidate_count || poll.candidateCount || poll.candidates?.length || 0,
         officeName: poll.office_name || poll.officeName,
         is_active: poll.is_active !== undefined ? poll.is_active : true,
-        candidates: poll.candidates || [] // <- ensure candidates is an array
+        candidates: poll.candidates
       }));
       setPolls(transformedPolls);
     } catch (error: any) {
@@ -99,7 +98,9 @@ const PollManagement: React.FC = () => {
     
     try {
       setError('');
-      await api.updatePoll(editingPoll.id, updatedPoll);
+      console.log('Updating poll:', editingPoll.id, updatedPoll);
+      const response = await api.updatePoll(editingPoll.id, updatedPoll);
+      console.log('Update response:', response);
       setEditingPoll(null);
       fetchPolls();
     } catch (error: any) {
@@ -108,6 +109,22 @@ const PollManagement: React.FC = () => {
     }
   };
 
+    // Replace the handleEditPoll click handler
+  const handleEditPoll = async (poll: Poll) => {
+    try {
+      setError('');
+      setLoading(true);
+      // Fetch full poll details with candidates
+      const fullPollDetails = await api.getPoll(poll.id);
+      setEditingPoll(fullPollDetails);
+    } catch (error: any) {
+      setError(error.message || 'Failed to load poll details');
+      console.error('Error loading poll:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   if (loading) return (
     <div className="loading-container">
       <div className="spinner"></div>
@@ -170,7 +187,8 @@ const PollManagement: React.FC = () => {
                 <td>
                   <div className="action-buttons">
                     <button 
-                      onClick={() => setEditingPoll(poll)}
+                      // onClick={() => setEditingPoll(poll)}
+                      onClick={() => handleEditPoll(poll)}
                       className="btn-action btn-edit"
                       title="Edit poll"
                     >
