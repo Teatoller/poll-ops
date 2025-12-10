@@ -657,3 +657,191 @@
   z-index: 1000;
   margin-bottom: -5px;
 }
+
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 1024px) {
+  .reports-export-container {
+    padding: 1.5rem;
+  }
+
+  .export-header h1 {
+    font-size: 2rem;
+  }
+
+  .export-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .reports-export-container {
+    padding: 1rem;
+  }
+
+  .export-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .export-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .export-grid {
+    gap: 1rem;
+  }
+
+  .export-controls,
+  .export-history {
+    padding: 1rem;
+  }
+
+  .export-card,
+  .history-card,
+  .quick-export-card {
+    padding: 1rem;
+  }
+
+  .export-card h2,
+  .history-card h2,
+  .quick-export-card h3 {
+    font-size: 1.25rem;
+  }
+
+  .type-selector,
+  .format-selector {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .type-option,
+  .format-option {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .date-range {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .date-range input {
+    width: 100%;
+  }
+
+  .export-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .export-actions button {
+    width: 100%;
+  }
+
+  .quick-export-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .history-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .history-item-info,
+  .history-item-actions {
+    width: 100%;
+  }
+
+  .history-item-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .reports-export-container {
+    padding: 0.75rem;
+  }
+
+  .export-header {
+    margin-bottom: 1rem;
+  }
+
+  .export-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .export-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .export-card,
+  .history-card,
+  .quick-export-card {
+    padding: 0.75rem;
+  }
+
+  .export-card h2,
+  .history-card h2,
+  .quick-export-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .form-group select,
+  .form-group input {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .export-actions button {
+    padding: 0.65rem;
+    font-size: 0.9rem;
+  }
+
+  .export-info ul li {
+    font-size: 0.85rem;
+  }
+
+  .history-item {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .quick-export-item {
+    padding: 0.75rem;
+  }
+
+  .quick-export-item h4 {
+    font-size: 0.95rem;
+  }
+
+  .quick-export-item p {
+    font-size: 0.8rem;
+  }
+
+  .type-option i,
+  .format-option i {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .export-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .export-card h2,
+  .history-card h2 {
+    font-size: 1rem;
+  }
+
+  .form-group select,
+  .form-group input {
+    font-size: 0.85rem;
+  }
+}

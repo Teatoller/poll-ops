@@ -196,6 +196,18 @@
   gap: 20px;
 }
 
+@media (max-width: 768px) {
+  .polls-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .polls-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
 .poll-card {
   background: white;
   padding: 25px;
@@ -766,4 +778,641 @@
 .results-error h2, .no-results h2 {
   color: #e74c3c;
   margin-bottom: 15px;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN - MOBILE FIRST
+   ======================================== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+  .dashboard-content {
+    padding: 1.5rem;
+  }
+
+  .polls-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .quick-stats .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .results-content {
+    padding: 1.5rem;
+  }
+
+  .vote-bar-container {
+    width: 150px;
+  }
+}
+
+/* Mobile Landscape & Small Tablets (481px - 768px) */
+@media (max-width: 768px) {
+  /* Login & Register */
+  .login-container,
+  .register-container {
+    padding: 1rem;
+  }
+
+  .login-form,
+  .register-form {
+    padding: 2rem 1.5rem;
+    max-width: 100%;
+  }
+
+  .login-form h2,
+  .register-form h2 {
+    font-size: 1.5rem;
+  }
+
+  /* Dashboard */
+  .dashboard-header {
+    padding: 1rem;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .user-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .user-info {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .refresh-button,
+  .logout-button {
+    width: 100%;
+  }
+
+  .dashboard-content {
+    padding: 1rem;
+  }
+
+  .user-profile-card {
+    padding: 1.5rem;
+  }
+
+  .polls-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .poll-card {
+    padding: 1.25rem;
+  }
+
+  .poll-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .poll-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .action-button {
+    width: 100%;
+  }
+
+  .quick-stats .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Polling Station */
+  .polling-station {
+    padding: 1rem;
+  }
+
+  .polling-header {
+    padding: 1.5rem;
+  }
+
+  .poll-card {
+    padding: 1.5rem;
+  }
+
+  .candidates-list {
+    gap: 0.75rem;
+  }
+
+  .candidate-item {
+    padding: 1rem;
+  }
+
+  .vote-actions {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+
+  .vote-actions button {
+    width: 100%;
+  }
+
+  /* Results */
+  .results-header {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .header-left,
+  .header-right {
+    width: 100%;
+  }
+
+  .header-right {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .refresh-button,
+  .back-button {
+    width: 100%;
+  }
+
+  .results-content {
+    padding: 1rem;
+  }
+
+  .poll-info-card {
+    padding: 1.5rem;
+  }
+
+  .poll-meta {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .candidate-result {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .candidate-rank {
+    align-self: flex-start;
+  }
+
+  .candidate-info {
+    width: 100%;
+  }
+
+  .vote-stats {
+    width: 100%;
+    text-align: left;
+    margin-right: 0;
+  }
+
+  .vote-bar-container {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .vote-numbers {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .location-breakdown {
+    overflow-x: auto;
+  }
+
+  .location-table {
+    min-width: 600px;
+  }
+
+  .summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* Mobile Portrait (320px - 480px) */
+@media (max-width: 480px) {
+  /* Typography adjustments */
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+
+  h4 {
+    font-size: 1rem;
+  }
+
+  /* Login & Register */
+  .login-form,
+  .register-form {
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .login-button,
+  .register-button {
+    padding: 0.875rem;
+    font-size: 0.95rem;
+  }
+
+  /* Dashboard */
+  .dashboard-header {
+    padding: 0.75rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .user-actions span {
+    font-size: 0.875rem;
+  }
+
+  .dashboard-content {
+    padding: 0.75rem;
+  }
+
+  .user-profile-card {
+    padding: 1rem;
+  }
+
+  .profile-details p {
+    font-size: 0.9rem;
+  }
+
+  .verification-status {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .polls-count {
+    font-size: 0.875rem;
+  }
+
+  .poll-card {
+    padding: 1rem;
+  }
+
+  .poll-header h3 {
+    font-size: 1rem;
+  }
+
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+  }
+
+  .poll-description {
+    font-size: 0.9rem;
+  }
+
+  .poll-meta {
+    font-size: 0.85rem;
+  }
+
+  .action-button {
+    padding: 0.7rem;
+    font-size: 0.9rem;
+  }
+
+  .voted-badge,
+  .ended-badge {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  .quick-stats h3 {
+    font-size: 1.1rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+  }
+
+  /* Polling Station */
+  .polling-station {
+    padding: 0.75rem;
+  }
+
+  .polling-header {
+    padding: 1rem;
+  }
+
+  .polling-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .poll-description,
+  .voter-info p {
+    font-size: 0.9rem;
+  }
+
+  .poll-card {
+    padding: 1rem;
+  }
+
+  .poll-instructions {
+    font-size: 0.9rem;
+  }
+
+  .candidate-item {
+    padding: 0.75rem;
+  }
+
+  .candidate-name {
+    font-size: 1rem;
+  }
+
+  .candidate-party {
+    font-size: 0.85rem;
+  }
+
+  .candidate-description {
+    font-size: 0.85rem;
+  }
+
+  .voting-rules {
+    padding: 1rem;
+  }
+
+  .voting-rules h4 {
+    font-size: 1rem;
+  }
+
+  .voting-rules li {
+    font-size: 0.85rem;
+  }
+
+  /* Results */
+  .results-header {
+    padding: 0.75rem;
+  }
+
+  .results-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .poll-title {
+    font-size: 0.9rem;
+  }
+
+  .refresh-button,
+  .back-button {
+    padding: 0.6rem 0.875rem;
+    font-size: 0.85rem;
+  }
+
+  .results-content {
+    padding: 0.75rem;
+  }
+
+  .poll-info-card {
+    padding: 1rem;
+  }
+
+  .poll-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .meta-item {
+    font-size: 0.85rem;
+  }
+
+  .meta-value {
+    font-size: 1rem;
+  }
+
+  .section-header h4 {
+    font-size: 1rem;
+  }
+
+  .section-info {
+    font-size: 0.8rem;
+  }
+
+  .candidate-result {
+    padding: 0.875rem;
+  }
+
+  .candidate-rank {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+
+  .rank-number {
+    font-size: 0.9rem;
+  }
+
+  .leading-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .candidate-name {
+    font-size: 1rem;
+  }
+
+  .candidate-party {
+    font-size: 0.85rem;
+  }
+
+  .vote-count {
+    font-size: 0.9rem;
+  }
+
+  .vote-percentage {
+    font-size: 1rem;
+  }
+
+  .location-breakdown h4 {
+    font-size: 1rem;
+  }
+
+  .location-table {
+    font-size: 0.85rem;
+  }
+
+  .results-summary {
+    padding: 1rem;
+  }
+
+  .results-summary h4 {
+    font-size: 1rem;
+  }
+
+  .summary-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stat {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+  }
+
+  .live-updates {
+    font-size: 0.85rem;
+  }
+
+  /* Loading states */
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+  }
+
+  .dashboard-loading,
+  .results-loading,
+  .results-error,
+  .no-results {
+    padding: 40px 1rem;
+  }
+}
+
+/* Extra Small Devices (< 320px) */
+@media (max-width: 320px) {
+  .login-form,
+  .register-form {
+    padding: 1rem 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 0.65rem;
+    font-size: 0.9rem;
+  }
+
+  .dashboard-content,
+  .polling-station,
+  .results-content {
+    padding: 0.5rem;
+  }
+
+  .poll-card {
+    padding: 0.875rem;
+  }
+
+  .action-button {
+    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .candidate-result {
+    padding: 0.75rem;
+  }
+
+  .stat-value {
+    font-size: 1.25rem;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 600px) and (orientation: landscape) {
+  .login-container,
+  .register-container {
+    padding: 1rem;
+    align-items: flex-start;
+  }
+
+  .login-form,
+  .register-form {
+    margin: 1rem 0;
+  }
+
+  .dashboard-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .polling-header {
+    padding: 1rem;
+  }
+}
+
+/* High DPI / Retina displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .login-form,
+  .register-form,
+  .poll-card,
+  .candidate-item {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .action-button,
+  .login-button,
+  .register-button,
+  .refresh-button,
+  .back-button,
+  .logout-button {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+
+  .candidate-item,
+  .candidate-radio {
+    min-height: 44px;
+  }
+
+  .nav-item {
+    min-height: 44px;
+  }
 }

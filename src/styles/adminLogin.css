@@ -591,3 +591,132 @@
   margin: 0;
   cursor: pointer;
 }
+
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 768px) {
+  .admin-login-container {
+    padding: 1rem;
+  }
+
+  .admin-login-card {
+    padding: 1.5rem;
+    min-height: auto;
+  }
+
+  .admin-login-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .login-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .admin-login-sidebar {
+    padding: 1.5rem;
+    min-height: auto;
+  }
+
+  .sidebar-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .features-list li {
+    font-size: 0.9rem;
+  }
+
+  .system-status h3 {
+    font-size: 1.1rem;
+  }
+
+  .status-item {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-login-container {
+    padding: 0.5rem;
+  }
+
+  .admin-login-card {
+    padding: 1.25rem;
+    border-radius: 8px;
+  }
+
+  .admin-login-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .admin-login-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .login-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .form-group input {
+    padding: 0.65rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-login {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .admin-login-sidebar {
+    padding: 1rem;
+  }
+
+  .sidebar-content h2 {
+    font-size: 1.25rem;
+  }
+
+  .features-list li {
+    font-size: 0.85rem;
+    padding: 0.5rem 0;
+  }
+
+  .system-status {
+    padding: 1rem;
+  }
+
+  .system-status h3 {
+    font-size: 1rem;
+  }
+
+  .status-item {
+    font-size: 0.8rem;
+  }
+
+  .login-help summary {
+    font-size: 0.85rem;
+  }
+
+  .help-content p {
+    font-size: 0.8rem;
+  }
+
+  .security-notice {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .admin-login-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .features-list li {
+    font-size: 0.8rem;
+  }
+
+  .form-group input {
+    padding: 0.6rem;
+  }
+}

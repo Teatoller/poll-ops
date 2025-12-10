@@ -183,9 +183,6 @@ const Results: React.FC = () => {
 
   const { poll, candidates, locationBreakdown, summary } = pollResults;
 
-  console.log("this pollResults--->", pollResults)
-  console.log("poll hala pollResults--->>>", poll)
-
   return (
     <div className="results">
       <div className="results-header">

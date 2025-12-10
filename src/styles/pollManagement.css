@@ -1,6 +1,8 @@
 /* src/components/admin/PollManagement.css */
 .poll-management {
   padding: 1.5rem;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .page-header {
@@ -10,6 +12,7 @@
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #e5e7eb;
+  max-width: 100%;
 }
 
 .page-header h2 {
@@ -52,11 +55,14 @@
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .polls-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto;
 }
 
 .polls-table thead {
@@ -250,23 +256,118 @@
   }
 }
 
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 1024px) {
+  .poll-management {
+    padding: 1rem;
+  }
+
+  .page-header h2 {
+    font-size: 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .poll-management {
+    padding: 0.75rem;
+    overflow-x: hidden;
+  }
+
   .page-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 1rem;
+  }
+
+  .page-header h2 {
+    font-size: 1.25rem;
   }
   
   .btn-primary {
     align-self: stretch;
     justify-content: center;
+    width: 100%;
+  }
+
+  .polls-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .polls-table {
+    min-width: 800px;
+  }
+
+  .polls-table th,
+  .polls-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
   }
   
   .action-buttons {
     flex-direction: column;
+    gap: 0.25rem;
   }
   
   .btn-action {
     justify-content: center;
+    width: 100%;
+  }
+
+  .description-cell {
+    max-width: 150px;
+  }
+
+  .delete-hint {
+    font-size: 0.7rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .poll-management {
+    padding: 0.5rem;
+  }
+
+  .page-header {
+    margin-bottom: 1rem;
+  }
+
+  .page-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .polls-table {
+    font-size: 0.8rem;
+    min-width: 700px;
+  }
+
+  .polls-table th,
+  .polls-table td {
+    padding: 0.5rem 0.25rem;
+  }
+
+  .description-cell {
+    max-width: 100px;
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+  }
+
+  .btn-action {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .polls-table {
+    font-size: 0.75rem;
+  }
+
+  .page-header h2 {
+    font-size: 1rem;
   }
 }

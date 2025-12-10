@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAdmin } from '../../contexts/AdminContext';
+import '../../styles/admin.css';
 
 const AdminLayout: React.FC = () => {
   const { admin, adminLogout, loading } = useAdmin();

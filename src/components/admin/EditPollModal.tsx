@@ -55,6 +55,19 @@ const EditPollModal: React.FC<EditPollModalProps> = ({ poll, onClose, onSave }) 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Helper function to format date for datetime-local input
+  const formatDateForInput = (dateString: string | undefined): string => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+      // Format as YYYY-MM-DDTHH:MM (datetime-local format)
+      return date.toISOString().slice(0, 16);
+    } catch {
+      return '';
+    }
+  };
+
   useEffect(() => {
     // Initialize form data when poll changes
     const formattedCandidates = poll.candidates.map(candidate => ({
@@ -68,8 +81,8 @@ const EditPollModal: React.FC<EditPollModalProps> = ({ poll, onClose, onSave }) 
     setFormData({
       officeName: poll.officeName,
       description: poll.description,
-      startDate: new Date(poll.startDate).toISOString().slice(0, 16),
-      endDate: new Date(poll.endDate).toISOString().slice(0, 16),
+      startDate: formatDateForInput(poll.startDate),
+      endDate: formatDateForInput(poll.endDate),
       is_active: poll.is_active,
       candidates: formattedCandidates
     });
