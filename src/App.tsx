@@ -16,6 +16,7 @@ import ReportsExport from './components/admin/ReportsExport';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminLogin from './components/admin/AdminLogin';
 import { AdminProvider } from './contexts/AdminContext';
+import AdminSettings from './components/admin/AdminSettings';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -75,6 +76,7 @@ const App: React.FC = () => {
                 <Route path="users" element={<UserManagement />} />
                 <Route path="results" element={<ResultsAnalytics />} />
                 <Route path="reports" element={<ReportsExport />} />
+                <Route path="settings" element={<AdminSettings />} />
               </Route>
 
             </Routes>

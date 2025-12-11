@@ -284,6 +284,45 @@ export const adminAPI = {
   exportPolls: async (format: ExportFormat = 'csv') => {
     return adminAPI.exportData('polls', { format });
   },
+
+  // Settings endpoints
+  getSettings: async (): Promise<any> => {
+    return adminApiFetch('/settings');
+  },
+
+  updateSettings: async (settings: any): Promise<{ message: string }> => {
+    return adminApiFetch('/settings', {
+      method: 'PUT',
+      body: JSON.stringify({ settings }),
+    });
+  },
+
+  resetSettings: async (): Promise<{ message: string }> => {
+    return adminApiFetch('/settings/reset', {
+      method: 'POST',
+    });
+  },
+
+  testEmail: async (email: string): Promise<{ message: string }> => {
+    return adminApiFetch('/settings/test-email', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  testSMS: async (phone: string): Promise<{ message: string }> => {
+    return adminApiFetch('/settings/test-sms', {
+      method: 'POST',
+      body: JSON.stringify({ phone }),
+    });
+  },
+
+  testWebhook: async (webhookUrl: string): Promise<{ message: string }> => {
+    return adminApiFetch('/settings/test-webhook', {
+      method: 'POST',
+      body: JSON.stringify({ webhookUrl }),
+    });
+  },
 };
 
 // Main API service for regular users
@@ -417,6 +456,15 @@ export const api = {
   // Delete poll - MISSING
   deletePoll: async (pollId: number): Promise<{ message: string }> => {
     return adminAPI.deletePoll(pollId);
+  },
+
+  // Settings functions for backward compatibility
+  getSettings: async (): Promise<any> => {
+    return adminAPI.getSettings();
+  },
+
+  updateSettings: async (settings: any): Promise<{ message: string }> => {
+    return adminAPI.updateSettings(settings);
   },
 };
 
