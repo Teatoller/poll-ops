@@ -271,6 +271,61 @@
   color: #0c4a6e;
 }
 
+.alert-box strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.alert-box p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+/* API Key Display */
+.api-key-display {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  background: #f8fafc;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+}
+
+.api-key-display code {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  color: #334155;
+  word-break: break-all;
+}
+
+.btn-copy {
+  padding: 0.5rem 1rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.btn-copy:hover {
+  background: #5568d3;
+  transform: translateY(-1px);
+}
+
+.setting-warning {
+  color: #dc2626;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
 /* Loading State */
 .settings-page > div:first-child {
   display: flex;

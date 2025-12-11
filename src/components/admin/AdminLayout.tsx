@@ -27,6 +27,14 @@ const AdminLayout: React.FC = () => {
     navigate('/admin/login', { replace: true });
   };
 
+  const handleRefresh = () => {
+    // Soft refresh: Re-navigate to current route to trigger component re-mount
+    // Better for mobile - only refetches data, keeps assets cached
+    const currentPath = location.pathname;
+    navigate('/admin', { replace: true });
+    setTimeout(() => navigate(currentPath, { replace: true }), 0);
+  };
+
   // Show loading state
   if (loading) {
     return (
@@ -104,7 +112,9 @@ const AdminLayout: React.FC = () => {
             <p className="breadcrumb">Manage your polling application</p>
           </div>
           <div className="header-actions">
-            <button className="refresh-button">⟳ Refresh</button>
+            <button className="refresh-button" onClick={handleRefresh}>
+              ⟳ Refresh
+            </button>
             <div className="user-badge">
               <span className="user-avatar">A</span>
               <span>Admin</span>

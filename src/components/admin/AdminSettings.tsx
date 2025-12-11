@@ -433,6 +433,416 @@ const AdminSettings: React.FC = () => {
           </div>
         )}
 
+        {activeTab === 'notifications' && (
+          <div className="settings-section">
+            <h3>Notification Settings</h3>
+            <div className="settings-grid">
+              <div className="setting-item">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.notifications?.sendRegistrationConfirmation || true}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      notifications: { ...settings.notifications, sendRegistrationConfirmation: e.target.checked }
+                    })}
+                  />
+                  Send registration confirmation emails
+                </label>
+                <p className="setting-description">
+                  Send email when user successfully registers
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.notifications?.sendVoteConfirmation || true}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      notifications: { ...settings.notifications, sendVoteConfirmation: e.target.checked }
+                    })}
+                  />
+                  Send vote confirmation
+                </label>
+                <p className="setting-description">
+                  Notify users after they successfully cast a vote
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.notifications?.sendPollReminders || true}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      notifications: { ...settings.notifications, sendPollReminders: e.target.checked }
+                    })}
+                  />
+                  Send poll reminders
+                </label>
+                <p className="setting-description">
+                  Remind registered users about upcoming polls
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.notifications?.sendResultsAnnouncement || true}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      notifications: { ...settings.notifications, sendResultsAnnouncement: e.target.checked }
+                    })}
+                  />
+                  Send results announcement
+                </label>
+                <p className="setting-description">
+                  Notify users when poll results are published
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'security' && (
+          <div className="settings-section">
+            <h3>Security Settings</h3>
+            <div className="settings-grid">
+              <div className="setting-item">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.security?.requireStrongPasswords || true}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      security: { ...settings.security, requireStrongPasswords: e.target.checked }
+                    })}
+                  />
+                  Require strong passwords
+                </label>
+                <p className="setting-description">
+                  Enforce password complexity requirements
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>Minimum Password Length</label>
+                <input
+                  type="number"
+                  min="6"
+                  max="32"
+                  value={settings.security?.passwordMinLength || 8}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    security: { ...settings.security, passwordMinLength: Number.parseInt(e.target.value) }
+                  })}
+                />
+                <p className="setting-description">
+                  Minimum number of characters required
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.security?.enableTwoFactorAuth || false}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      security: { ...settings.security, enableTwoFactorAuth: e.target.checked }
+                    })}
+                  />
+                  Enable Two-Factor Authentication
+                </label>
+                <p className="setting-description">
+                  Require 2FA for admin accounts (coming soon)
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>Session Timeout (minutes)</label>
+                <input
+                  type="number"
+                  min="5"
+                  max="1440"
+                  value={settings.security?.sessionTimeout || 60}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    security: { ...settings.security, sessionTimeout: Number.parseInt(e.target.value) }
+                  })}
+                />
+                <p className="setting-description">
+                  Auto-logout users after inactivity
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>Max Login Attempts</label>
+                <input
+                  type="number"
+                  min="3"
+                  max="10"
+                  value={settings.security?.maxLoginAttempts || 5}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    security: { ...settings.security, maxLoginAttempts: Number.parseInt(e.target.value) }
+                  })}
+                />
+                <p className="setting-description">
+                  Lock account after failed attempts
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>IP Whitelist (comma-separated)</label>
+                <input
+                  type="text"
+                  value={settings.security?.ipWhitelist?.join(', ') || ''}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    security: { 
+                      ...settings.security, 
+                      ipWhitelist: e.target.value.split(',').map((ip: string) => ip.trim()).filter(Boolean)
+                    }
+                  })}
+                  placeholder="192.168.1.1, 10.0.0.1"
+                />
+                <p className="setting-description">
+                  Leave empty to allow all IPs
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'display' && (
+          <div className="settings-section">
+            <h3>Display & UI Settings</h3>
+            <div className="settings-grid">
+              <div className="setting-item">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.display?.showLiveResults || true}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      display: { ...settings.display, showLiveResults: e.target.checked }
+                    })}
+                  />
+                  Show live results
+                </label>
+                <p className="setting-description">
+                  Display results in real-time as votes are cast
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.display?.showCandidatePhotos || true}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      display: { ...settings.display, showCandidatePhotos: e.target.checked }
+                    })}
+                  />
+                  Show candidate photos
+                </label>
+                <p className="setting-description">
+                  Display candidate profile pictures
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.display?.showVoteCounts || true}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      display: { ...settings.display, showVoteCounts: e.target.checked }
+                    })}
+                  />
+                  Show vote counts
+                </label>
+                <p className="setting-description">
+                  Display number of votes on results page
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>Theme</label>
+                <select
+                  value={settings.display?.theme || 'light'}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    display: { ...settings.display, theme: e.target.value }
+                  })}
+                >
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                  <option value="auto">Auto (System)</option>
+                </select>
+                <p className="setting-description">
+                  Choose the default color theme
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>Language</label>
+                <select
+                  value={settings.display?.language || 'en'}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    display: { ...settings.display, language: e.target.value }
+                  })}
+                >
+                  <option value="en">English</option>
+                  <option value="sw">Kiswahili</option>
+                  <option value="fr">French</option>
+                  <option value="es">Spanish</option>
+                </select>
+                <p className="setting-description">
+                  Default interface language
+                </p>
+              </div>
+
+              <div className="setting-item">
+                <label>Timezone</label>
+                <select
+                  value={settings.display?.timezone || 'UTC'}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    display: { ...settings.display, timezone: e.target.value }
+                  })}
+                >
+                  <option value="UTC">UTC (Coordinated Universal Time)</option>
+                  <option value="Africa/Nairobi">East Africa Time (EAT)</option>
+                  <option value="Africa/Lagos">West Africa Time (WAT)</option>
+                  <option value="Africa/Cairo">Central Africa Time (CAT)</option>
+                  <option value="Africa/Johannesburg">South Africa Time (SAST)</option>
+                  <option value="America/New_York">Eastern Time (ET)</option>
+                  <option value="America/Chicago">Central Time (CT)</option>
+                  <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                  <option value="Europe/London">British Time (GMT/BST)</option>
+                  <option value="Europe/Paris">Central European Time (CET)</option>
+                  <option value="Asia/Dubai">Gulf Standard Time (GST)</option>
+                  <option value="Asia/Kolkata">India Standard Time (IST)</option>
+                  <option value="Asia/Shanghai">China Standard Time (CST)</option>
+                  <option value="Asia/Tokyo">Japan Standard Time (JST)</option>
+                </select>
+                <p className="setting-description">
+                  System timezone for dates and times
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'sms' && (
+          <div className="settings-section">
+            <h3>SMS Configuration</h3>
+            <div className="settings-grid">
+              <div className="setting-item">
+                <label>SMS Provider</label>
+                <select
+                  value={settings.sms?.provider || 'mock'}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    sms: { ...settings.sms, provider: e.target.value }
+                  })}
+                >
+                  <option value="mock">Mock (Development)</option>
+                  <option value="twilio">Twilio</option>
+                  <option value="africastalking">Africa's Talking</option>
+                  <option value="nexmo">Vonage (Nexmo)</option>
+                  <option value="aws-sns">AWS SNS</option>
+                </select>
+                <p className="setting-description">
+                  Choose your SMS service provider
+                </p>
+              </div>
+
+              {settings.sms?.provider !== 'mock' && (
+                <>
+                  <div className="setting-item">
+                    <label>Account SID / API Key</label>
+                    <input
+                      type="text"
+                      value={settings.sms?.accountSid || ''}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        sms: { ...settings.sms, accountSid: e.target.value }
+                      })}
+                      placeholder="Enter your account SID or API key"
+                    />
+                    <p className="setting-description">
+                      Your SMS provider account identifier
+                    </p>
+                  </div>
+
+                  <div className="setting-item">
+                    <label>Auth Token / API Secret</label>
+                    <input
+                      type="password"
+                      value={settings.sms?.authToken || ''}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        sms: { ...settings.sms, authToken: e.target.value }
+                      })}
+                      placeholder="Enter your auth token or API secret"
+                    />
+                    <p className="setting-description">
+                      Your SMS provider authentication token
+                    </p>
+                  </div>
+
+                  <div className="setting-item">
+                    <label>Sender Phone Number</label>
+                    <input
+                      type="tel"
+                      value={settings.sms?.phoneNumber || ''}
+                      onChange={(e) => setSettings({
+                        ...settings,
+                        sms: { ...settings.sms, phoneNumber: e.target.value }
+                      })}
+                      placeholder="+1234567890"
+                    />
+                    <p className="setting-description">
+                      Phone number or sender ID for outgoing SMS
+                    </p>
+                  </div>
+                </>
+              )}
+
+              <div className="setting-item">
+                <label>Test SMS Configuration</label>
+                <button
+                  onClick={handleTestSMS}
+                  className="btn-secondary"
+                  disabled={testingSMS}
+                >
+                  {testingSMS ? 'Sending...' : 'Send Test SMS'}
+                </button>
+                <p className="setting-description">
+                  Send a test message to verify configuration
+                </p>
+              </div>
+
+              {settings.sms?.provider === 'mock' && (
+                <div className="alert-box info">
+                  <strong>ℹ️ Development Mode</strong>
+                  <p>SMS messages are being logged to console instead of sent. Configure a real provider for production use.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {activeTab === 'api' && (
           <div className="settings-section">
             <h3>API & Integration Settings</h3>
@@ -479,7 +889,7 @@ const AdminSettings: React.FC = () => {
                       value={settings.api?.rateLimit || 100}
                       onChange={(e) => setSettings({
                         ...settings,
-                        api: { ...settings.api, rateLimit: parseInt(e.target.value) }
+                        api: { ...settings.api, rateLimit: Number.parseInt(e.target.value) }
                       })}
                     />
                   </div>
@@ -549,8 +959,6 @@ const AdminSettings: React.FC = () => {
             </div>
           </div>
         )}
-
-        {/* Add other tabs similarly... */}
       </div>
     </div>
   );
