@@ -207,6 +207,12 @@ export const adminAPI = {
     });
   },
 
+  deleteUser: async (userId: number): Promise<{ message: string; user: any }> => {
+    return adminApiFetch(`/admin/users/${userId}`, {
+      method: 'DELETE',
+    });
+  },
+
   deleteUsers: async (userIds: number[]): Promise<{ message: string }> => {
     return adminApiFetch('/admin/users/bulk-delete', {
       method: 'POST',

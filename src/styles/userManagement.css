@@ -238,6 +238,20 @@
   transform: translateY(-1px);
 }
 
+.btn-delete {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.btn-delete:before {
+  content: '🗑️';
+}
+
+.btn-delete:hover {
+  background: #fecaca;
+  transform: translateY(-1px);
+}
+
 .no-data {
   text-align: center;
   padding: 3rem;

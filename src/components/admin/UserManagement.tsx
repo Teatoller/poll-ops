@@ -137,6 +137,24 @@ const UserManagement: React.FC = () => {
     }
   };
 
+  const handleDeleteUser = async (userId: number, userEmail: string) => {
+    if (!window.confirm(`Are you sure you want to delete user: ${userEmail}?\n\nThis action cannot be undone. Users with voting history cannot be deleted.`)) {
+      return;
+    }
+
+    try {
+      setLoadingUser(true);
+      await adminAPI.deleteUser(userId);
+      alert('User deleted successfully');
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      alert(error.message || 'Failed to delete user');
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+
   const handleViewUser = async (userId: number) => {
     try {
       setLoadingUser(true);
@@ -280,6 +298,13 @@ const UserManagement: React.FC = () => {
                     disabled={loadingUser}
                   >
                     Edit
+                  </button>
+                  <button 
+                    className="btn-action btn-delete"
+                    onClick={() => handleDeleteUser(user.id, user.email)}
+                    disabled={loadingUser}
+                  >
+                    Delete
                   </button>
                 </td>
               </tr>
