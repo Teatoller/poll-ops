@@ -2,22 +2,37 @@
 import React, { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-// import '../reportsExport.css';
+
 import '../../styles/reportsExport.css';
+
+interface ExportRecord {
+  id: number;
+  type: string;
+  format: string;
+  filename: string;
+  timestamp: string;
+  exportedBy: string;
+}
+
+interface Poll {
+  id: number;
+  officeName?: string;
+  office_name?: string;
+}
 
 const ReportsExport = () => {
   const [exportType, setExportType] = useState('votes');
   const [format, setFormat] = useState('csv');
-  const [selectedPoll, setSelectedPoll] = useState('');
+  const [selectedPoll, setSelectedPoll] = useState(''); 
   const [dateRange, setDateRange] = useState({
     start: '',
     end: ''
   });
   const [includeInactive, setIncludeInactive] = useState(false);
-  const [polls, setPolls] = useState([]);
+  const [polls, setPolls] = useState<Poll[]>([]);
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [recentExports, setRecentExports] = useState([]);
+  const [recentExports, setRecentExports] = useState<ExportRecord[]>([]);
   
   const { admin } = useAuth();
 
@@ -30,9 +45,10 @@ const ReportsExport = () => {
     try {
       setLoading(true);
       const response = await adminAPI.getPolls();
-      setPolls(response.data);
+      setPolls(response || []);
     } catch (error) {
       console.error('Error fetching polls:', error);
+      setPolls([]);
     } finally {
       setLoading(false);
     }
@@ -51,48 +67,53 @@ const ReportsExport = () => {
     try {
       setExporting(true);
       
-      let url = `/admin/export/${exportType}?format=${format}`;
-      const params = new URLSearchParams();
+      const params: any = {
+        format,
+        includeInactive
+      };
       
       if (exportType === 'votes' && selectedPoll) {
-        params.append('pollId', selectedPoll);
+        params.pollId = parseInt(selectedPoll);
       }
       
       if (dateRange.start) {
-        params.append('startDate', dateRange.start);
+        params.startDate = dateRange.start;
       }
       
       if (dateRange.end) {
-        params.append('endDate', dateRange.end);
-      }
-      
-      if (includeInactive) {
-        params.append('includeInactive', 'true');
-      }
-      
-      const queryString = params.toString();
-      if (queryString) {
-        url += `&${queryString}`;
+        params.endDate = dateRange.end;
       }
 
-      const response = await adminAPI.get(url, { responseType: 'blob' });
+      const response = await adminAPI.exportData(
+        exportType as 'users' | 'votes' | 'polls',
+        params
+      );
+      
+      // Handle the response properly - it returns an object with blob, contentType, filename
+      let blob: Blob;
+      let filename: string;
+      
+      if (response && typeof response === 'object' && 'blob' in response) {
+        blob = response.blob;
+        filename = response.filename || `${exportType}_export_${new Date().toISOString().split('T')[0]}.${format}`;
+      } else {
+        // Fallback if response is already text
+        blob = new Blob([typeof response === 'string' ? response : JSON.stringify(response)], { 
+          type: format === 'csv' ? 'text/csv' : 'application/json' 
+        });
+        filename = `${exportType}_export_${new Date().toISOString().split('T')[0]}.${format}`;
+      }
       
       // Create download link
-      const blob = new Blob([response.data], { 
-        type: format === 'csv' ? 'text/csv' : 'application/json' 
-      });
-      const downloadUrl = window.URL.createObjectURL(blob);
+      const downloadUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;
-      
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = `${exportType}_export_${timestamp}.${format}`;
       link.download = filename;
       
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(downloadUrl);
+      link.remove();
+      URL.revokeObjectURL(downloadUrl);
       
       // Save to recent exports
       const exportRecord = {
@@ -101,16 +122,18 @@ const ReportsExport = () => {
         format,
         filename,
         timestamp: new Date().toISOString(),
-        exportedBy: admin?.email
+        exportedBy: admin?.email || 'Admin'
       };
       
       const updatedExports = [exportRecord, ...recentExports].slice(0, 10);
       setRecentExports(updatedExports);
       localStorage.setItem('recentExports', JSON.stringify(updatedExports));
       
-    } catch (error) {
+      alert('Export completed successfully!');
+      
+    } catch (error: any) {
       console.error('Export failed:', error);
-      alert('Export failed. Please try again.');
+      alert(error.message || 'Export failed. Please try again.');
     } finally {
       setExporting(false);
     }
@@ -119,37 +142,63 @@ const ReportsExport = () => {
   const previewData = async () => {
     try {
       setLoading(true);
-      const response = await adminAPI.get(`/admin/export/${exportType}?format=json`);
+      
+      let data: any[] = [];
+      
+      switch (exportType) {
+        case 'users': {
+          const usersResponse = await adminAPI.getUsers();
+          data = usersResponse.users.slice(0, 10);
+          break;
+        }
+        case 'votes': {
+          alert('Vote preview is not available. Please export the data to view it.');
+          setLoading(false);
+          return;
+        }
+        case 'polls': {
+          const pollsResponse = await adminAPI.getPolls();
+          data = pollsResponse.slice(0, 10);
+          break;
+        }
+        default:
+          data = [];
+      }
       
       // Display preview in modal or new window
       const previewWindow = window.open('', '_blank');
-      previewWindow.document.write(`
-        <html>
-          <head>
-            <title>Data Preview</title>
-            <style>
-              body { font-family: monospace; padding: 20px; }
-              pre { background: #f5f5f5; padding: 15px; border-radius: 5px; }
-            </style>
-          </head>
-          <body>
-            <h2>${exportType.toUpperCase()} Data Preview (First 10 records)</h2>
-            <pre>${JSON.stringify(response.data.slice(0, 10), null, 2)}</pre>
-          </body>
-        </html>
-      `);
-      previewWindow.document.close();
+      if (previewWindow) {
+        previewWindow.document.write(`
+          <html>
+            <head>
+              <title>Data Preview</title>
+              <style>
+                body { font-family: monospace; padding: 20px; background: #f5f5f5; }
+                pre { background: white; padding: 20px; border-radius: 8px; overflow: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                h2 { color: #333; }
+              </style>
+            </head>
+            <body>
+              <h2>${exportType.toUpperCase()} Data Preview (First 10 records)</h2>
+              <pre>${JSON.stringify(data, null, 2)}</pre>
+            </body>
+          </html>
+        `);
+        previewWindow.document.close();
+      } else {
+        alert('Please allow pop-ups to preview data');
+      }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Preview failed:', error);
-      alert('Preview failed. Please try again.');
+      alert(error.message || 'Preview failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const downloadTemplate = (type) => {
-    const templates = {
+  const downloadTemplate = (type: string) => {
+    const templates: Record<string, string> = {
       users: `email,first_name,last_name,national_id,county,is_email_verified,created_at`,
       votes: `user_id,poll_id,candidate_id,county,created_at`,
       polls: `office_name,description,start_date,end_date,is_active,created_at`
@@ -157,12 +206,12 @@ const ReportsExport = () => {
     
     const template = templates[type] || '';
     const blob = new Blob([template], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = `${type}_import_template.csv`;
     link.click();
-    window.URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -216,11 +265,12 @@ const ReportsExport = () => {
                   value={selectedPoll}
                   onChange={(e) => setSelectedPoll(e.target.value)}
                   className="poll-select"
+                  disabled={loading}
                 >
                   <option value="">All Polls</option>
-                  {polls.map(poll => (
+                  {Array.isArray(polls) && polls.map((poll: any) => (
                     <option key={poll.id} value={poll.id}>
-                      {poll.office_name} ({poll.id})
+                      {poll.officeName || poll.office_name} ({poll.id})
                     </option>
                   ))}
                 </select>
