@@ -1,5 +1,6 @@
 // src/components/admin/ResultsAnalytics.tsx
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Line, Bar, Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -35,18 +36,44 @@ interface AnalyticsData {
 }
 
 const ResultsAnalytics: React.FC = () => {
+  const location = useLocation();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('7d');
+  const [selectedPollId, setSelectedPollId] = useState<number | null>(
+    location.state?.pollId || null
+  );
+  const [polls, setPolls] = useState<Array<{ id: number; officeName: string }>>([]);
+
+  useEffect(() => {
+    // Update selected poll if navigation state changes
+    if (location.state?.pollId) {
+      setSelectedPollId(location.state.pollId);
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    fetchPolls();
+  }, []);
 
   useEffect(() => {
     fetchAnalytics();
-  }, [timeRange]);
+  }, [timeRange, selectedPollId]);
+
+  const fetchPolls = async () => {
+    try {
+      const data = await api.getAdminPolls();
+      setPolls(data);
+    } catch (error) {
+      console.error('Error fetching polls:', error);
+    }
+  };
 
   const fetchAnalytics = async () => {
     try {
       // You'll need to create this endpoint
-      const data = await api.getAnalytics(timeRange);
+      // Pass selectedPollId as a query parameter
+      const data = await api.getAnalytics(timeRange, selectedPollId || undefined);
       setAnalytics(data);
     } catch (error) {
       console.error('Error fetching analytics:', error);
@@ -113,7 +140,24 @@ const ResultsAnalytics: React.FC = () => {
     <div className="results-analytics">
       <div className="page-header">
         <h2>Results Analytics</h2>
-        <div className="time-range-selector">
+        <div className="filters-container">
+          <div className="poll-filter">
+            <label htmlFor="poll-select">Filter by Poll:</label>
+            <select 
+              id="poll-select"
+              value={selectedPollId || ''} 
+              onChange={(e) => setSelectedPollId(e.target.value ? Number(e.target.value) : null)}
+              className="poll-selector"
+            >
+              <option value="">All Polls</option>
+              {polls.map(poll => (
+                <option key={poll.id} value={poll.id}>
+                  {poll.officeName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="time-range-selector">
           <button 
             onClick={() => setTimeRange('7d')} 
             className={timeRange === '7d' ? 'active' : ''}
@@ -138,6 +182,7 @@ const ResultsAnalytics: React.FC = () => {
           >
             1 Year
           </button>
+          </div>
         </div>
       </div>
 

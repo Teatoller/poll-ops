@@ -219,8 +219,12 @@ export const adminAPI = {
   },
 
   // Analytics & Statistics endpoints
-  getAnalytics: async (range: '7d' | '30d' | '90d' | '1y' = '7d'): Promise<AdminAnalytics> => {
-    return adminApiFetch(`/admin/analytics?range=${range}`);
+  getAnalytics: async (range: '7d' | '30d' | '90d' | '1y' = '7d', pollId?: number): Promise<AdminAnalytics> => {
+    const params = new URLSearchParams({ range });
+    if (pollId) {
+      params.append('pollId', pollId.toString());
+    }
+    return adminApiFetch(`/admin/analytics?${params.toString()}`);
   },
 
   getStatistics: async (): Promise<DashboardStatistics> => {
@@ -374,6 +378,11 @@ export const api = {
   // Statistics function for backward compatibility
   getStatistics: async (): Promise<DashboardStatistics> => {
     return adminAPI.getStatistics();
+  },
+
+  // Analytics function for backward compatibility
+  getAnalytics: async (range: '7d' | '30d' | '90d' | '1y' = '7d', pollId?: number): Promise<AdminAnalytics> => {
+    return adminAPI.getAnalytics(range, pollId);
   },
 
   // User management functions for backward compatibility
