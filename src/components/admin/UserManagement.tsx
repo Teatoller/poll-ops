@@ -1,6 +1,7 @@
 // src/components/admin/UserManagement.tsx - Updated
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import '../../styles/userManagement.css';
 // import type { User } from '../../types';
 
 interface UserManagementProps {
