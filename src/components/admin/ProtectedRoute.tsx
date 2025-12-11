@@ -1,28 +1,32 @@
 // src/components/admin/ProtectedRoute.tsx
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAdmin } from '../../contexts/AdminContext';
 
-interface ProtectedRouteProps {
-  requireAdmin?: boolean;
+interface AdminProtectedRouteProps {
+  children: React.ReactNode;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requireAdmin = false }) => {
-  const { user, admin } = useAuth();
-  
-  // Check authentication
-  if (!user && !admin) {
+const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({ children }) => {
+  const { admin, loading } = useAdmin();
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="admin-loading">
+        <div className="spinner"></div>
+        <p>Verifying authentication...</p>
+      </div>
+    );
+  }
+
+  // Redirect to admin login if not authenticated
+  if (!admin) {
     return <Navigate to="/admin/login" replace />;
   }
-  
-  // Check admin privileges if required
-  if (requireAdmin) {
-    const isAdmin = user?.email === 'admin@pollingapp.com' || admin?.role === 'admin';
-    if (!isAdmin) {
-      return <Navigate to="/admin/login" replace />;
-    }
-  }
-  
-  return <Outlet />;
+
+  // Render protected content if authenticated
+  return <>{children}</>;
 };
 
-export default ProtectedRoute;
+export default AdminProtectedRoute;

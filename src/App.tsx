@@ -17,6 +17,7 @@ import AdminLayout from './components/admin/AdminLayout';
 import AdminLogin from './components/admin/AdminLogin';
 import { AdminProvider } from './contexts/AdminContext';
 import AdminSettings from './components/admin/AdminSettings';
+import AdminProtectedRoute from './components/admin/ProtectedRoute';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -69,7 +70,14 @@ const App: React.FC = () => {
               <Route path="/" element={<Navigate to="/dashboard" />} />
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
-               <Route path="/admin" element={<AdminLayout />}>
+              <Route
+                path="/admin"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminLayout />
+                  </AdminProtectedRoute>
+                }
+              >
                 <Route index element={<Navigate to="dashboard" />} />
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="polls" element={<PollManagement />} />
