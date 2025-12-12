@@ -15,8 +15,6 @@ const Dashboard: React.FC = () => {
     remainingPolls: 0
   });
 
-  console.log("acttive", activePolls)
-  
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
