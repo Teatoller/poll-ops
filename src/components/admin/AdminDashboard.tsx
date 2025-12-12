@@ -1,7 +1,9 @@
 // src/components/admin/AdminDashboard.tsx - Fixed for your types
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api, adminAPI } from '../../services/api';
 import type { Poll, DashboardStatistics } from '../../types';
+import EditPollModal from './EditPollModal';
 
 interface DashboardStats {
   totalUsers: number;
@@ -31,6 +33,8 @@ const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [editingPoll, setEditingPoll] = useState<Poll | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboardData();
@@ -84,10 +88,6 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
-  };
-
   const getTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -111,6 +111,40 @@ const AdminDashboard: React.FC = () => {
       case 'registration': return '👤';
       case 'export': return '📊';
       default: return '📝';
+    }
+  };
+
+  const handleViewPoll = (pollId: number) => {
+    // Navigate to results page with poll filter
+    navigate('/admin/results', { state: { pollId } });
+  };
+
+  const handleEditPoll = async (poll: { id: number; officeName: string }) => {
+    try {
+      setError('');
+      setLoading(true);
+      // Fetch full poll details with candidates
+      const fullPollDetails = await api.getPoll(poll.id);
+      setEditingPoll(fullPollDetails);
+    } catch (error: any) {
+      setError(error.message || 'Failed to load poll details');
+      console.error('Error loading poll:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdatePoll = async (updatedPoll: any) => {
+    if (!editingPoll) return;
+    
+    try {
+      setError('');
+      await api.updatePoll(editingPoll.id, updatedPoll);
+      setEditingPoll(null);
+      fetchDashboardData(); // Refresh dashboard data
+    } catch (error: any) {
+      setError(error.message || 'Failed to update poll');
+      console.error('Error updating poll:', error);
     }
   };
 
@@ -207,7 +241,7 @@ const AdminDashboard: React.FC = () => {
                 {stats?.recentPolls.map(poll => (
                   <tr key={poll.id}>
                     <td>{poll.officeName}</td>
-                    <td>{poll.candidateCount || poll.candidates?.length || 0}</td>
+                    <td>{poll.candidateCount || 0}</td>
                     <td>{poll.totalVotes?.toLocaleString() || '0'}</td>
                     <td>
                       <span className={`status-badge ${poll.is_active ? 'status-active' : 'status-inactive'}`}>
@@ -215,8 +249,18 @@ const AdminDashboard: React.FC = () => {
                       </span>
                     </td>
                     <td className="actions-cell">
-                      <button className="btn-action btn-view">View</button>
-                      <button className="btn-action btn-edit">Edit</button>
+                      <button 
+                        className="btn-action btn-view"
+                        onClick={() => handleViewPoll(poll.id)}
+                      >
+                        View
+                      </button>
+                      <button 
+                        className="btn-action btn-edit"
+                        onClick={() => handleEditPoll(poll)}
+                      >
+                        Edit
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -275,6 +319,14 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {editingPoll && (
+        <EditPollModal
+          poll={editingPoll}
+          onClose={() => setEditingPoll(null)}
+          onSave={handleUpdatePoll}
+        />
+      )}
     </div>
   );
 };

@@ -207,6 +207,12 @@ export const adminAPI = {
     });
   },
 
+  deleteUser: async (userId: number): Promise<{ message: string; user: any }> => {
+    return adminApiFetch(`/admin/users/${userId}`, {
+      method: 'DELETE',
+    });
+  },
+
   deleteUsers: async (userIds: number[]): Promise<{ message: string }> => {
     return adminApiFetch('/admin/users/bulk-delete', {
       method: 'POST',
@@ -219,8 +225,12 @@ export const adminAPI = {
   },
 
   // Analytics & Statistics endpoints
-  getAnalytics: async (range: '7d' | '30d' | '90d' | '1y' = '7d'): Promise<AdminAnalytics> => {
-    return adminApiFetch(`/admin/analytics?range=${range}`);
+  getAnalytics: async (range: '7d' | '30d' | '90d' | '1y' = '7d', pollId?: number): Promise<AdminAnalytics> => {
+    const params = new URLSearchParams({ range });
+    if (pollId) {
+      params.append('pollId', pollId.toString());
+    }
+    return adminApiFetch(`/admin/analytics?${params.toString()}`);
   },
 
   getStatistics: async (): Promise<DashboardStatistics> => {
@@ -273,6 +283,45 @@ export const adminAPI = {
 
   exportPolls: async (format: ExportFormat = 'csv') => {
     return adminAPI.exportData('polls', { format });
+  },
+
+  // Settings endpoints
+  getSettings: async (): Promise<any> => {
+    return adminApiFetch('/settings');
+  },
+
+  updateSettings: async (settings: any): Promise<{ message: string }> => {
+    return adminApiFetch('/settings', {
+      method: 'PUT',
+      body: JSON.stringify({ settings }),
+    });
+  },
+
+  resetSettings: async (): Promise<{ message: string }> => {
+    return adminApiFetch('/settings/reset', {
+      method: 'POST',
+    });
+  },
+
+  testEmail: async (email: string): Promise<{ message: string }> => {
+    return adminApiFetch('/settings/test-email', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  testSMS: async (phone: string): Promise<{ message: string }> => {
+    return adminApiFetch('/settings/test-sms', {
+      method: 'POST',
+      body: JSON.stringify({ phone }),
+    });
+  },
+
+  testWebhook: async (webhookUrl: string): Promise<{ message: string }> => {
+    return adminApiFetch('/settings/test-webhook', {
+      method: 'POST',
+      body: JSON.stringify({ webhookUrl }),
+    });
   },
 };
 
@@ -376,6 +425,11 @@ export const api = {
     return adminAPI.getStatistics();
   },
 
+  // Analytics function for backward compatibility
+  getAnalytics: async (range: '7d' | '30d' | '90d' | '1y' = '7d', pollId?: number): Promise<AdminAnalytics> => {
+    return adminAPI.getAnalytics(range, pollId);
+  },
+
   // User management functions for backward compatibility
   getUsers: async (): Promise<any[]> => {
     // Call the paginated endpoint with default parameters
@@ -402,6 +456,15 @@ export const api = {
   // Delete poll - MISSING
   deletePoll: async (pollId: number): Promise<{ message: string }> => {
     return adminAPI.deletePoll(pollId);
+  },
+
+  // Settings functions for backward compatibility
+  getSettings: async (): Promise<any> => {
+    return adminAPI.getSettings();
+  },
+
+  updateSettings: async (settings: any): Promise<{ message: string }> => {
+    return adminAPI.updateSettings(settings);
   },
 };
 

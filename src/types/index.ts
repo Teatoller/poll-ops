@@ -162,3 +162,53 @@ export interface DashboardStatistics {
     timestamp: string;
   }>;
 }
+
+// src/components/admin/Settings.tsx
+export interface SystemSettings {
+  // Voting Settings
+  voting: {
+    allowSameDayRegistration: boolean;
+    votingHoursStart: string; // "08:00"
+    votingHoursEnd: string;   // "17:00"
+    maxVotesPerUser: number;
+    allowVoteEditing: boolean;
+    voteEditingDeadline: number; // hours before poll ends
+  };
+  
+  // Registration Settings
+  registration: {
+    requireEmailVerification: boolean;
+    requirePhoneVerification: boolean;
+    requireNationalId: boolean;
+    allowMultipleRegistrations: boolean;
+    registrationDeadline: number; // hours before poll starts
+  };
+  
+  // Notification Settings
+  notifications: {
+    sendRegistrationConfirmation: boolean;
+    sendVoteConfirmation: boolean;
+    sendPollReminders: boolean;
+    sendResultsAnnouncement: boolean;
+  };
+  
+  // Security Settings
+  security: {
+    requireStrongPasswords: boolean;
+    passwordMinLength: number;
+    enableTwoFactorAuth: boolean;
+    sessionTimeout: number; // minutes
+    maxLoginAttempts: number;
+    ipWhitelist: string[];
+  };
+  
+  // Display Settings
+  display: {
+    showLiveResults: boolean;
+    showCandidatePhotos: boolean;
+    showVoteCounts: boolean;
+    theme: 'light' | 'dark' | 'auto';
+    language: string;
+    timezone: string;
+  };
+}

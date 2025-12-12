@@ -1,5 +1,5 @@
 // src/components/admin/AdminLayout.tsx
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAdmin } from '../../contexts/AdminContext';
 import '../../styles/admin.css';
@@ -8,15 +8,6 @@ const AdminLayout: React.FC = () => {
   const { admin, adminLogout, loading } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Use useEffect for navigation
-  useEffect(() => {
-    // Only redirect if we're done loading and there's no admin
-    if (!loading && !admin) {
-      console.log('DEBUG - No admin found, redirecting to login');
-      navigate('/admin/login', { replace: true });
-    }
-  }, [admin, loading, navigate]);
 
   const isActive = (path: string) => {
     return location.pathname.startsWith(path) ? 'active' : '';
@@ -27,7 +18,15 @@ const AdminLayout: React.FC = () => {
     navigate('/admin/login', { replace: true });
   };
 
-  // Show loading state
+  const handleRefresh = () => {
+    // Soft refresh: Re-navigate to current route to trigger component re-mount
+    // Better for mobile - only refetches data, keeps assets cached
+    const currentPath = location.pathname;
+    navigate('/admin', { replace: true });
+    setTimeout(() => navigate(currentPath, { replace: true }), 0);
+  };
+
+  // Show loading state (route protection handles redirect)
   if (loading) {
     return (
       <div className="admin-loading">
@@ -37,7 +36,7 @@ const AdminLayout: React.FC = () => {
     );
   }
 
-  // If no admin after loading, show redirect message
+  // Defense-in-depth: This shouldn't render since route is protected
   if (!admin) {
     return (
       <div className="admin-loading">
@@ -104,7 +103,9 @@ const AdminLayout: React.FC = () => {
             <p className="breadcrumb">Manage your polling application</p>
           </div>
           <div className="header-actions">
-            <button className="refresh-button">⟳ Refresh</button>
+            <button className="refresh-button" onClick={handleRefresh}>
+              ⟳ Refresh
+            </button>
             <div className="user-badge">
               <span className="user-avatar">A</span>
               <span>Admin</span>

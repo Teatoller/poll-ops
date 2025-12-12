@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../../styles/adminLogin.css';
 import { useAdmin } from '../../contexts/AdminContext';
@@ -9,11 +9,18 @@ const AdminLogin = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { adminLogin } = useAdmin();
+  const { adminLogin, admin } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   
   const from = location.state?.from?.pathname || '/admin/dashboard';
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (admin) {
+      navigate(from, { replace: true });
+    }
+  }, [admin, navigate, from]);
 
    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

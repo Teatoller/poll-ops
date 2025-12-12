@@ -1,6 +1,9 @@
 // src/components/admin/UserManagement.tsx - Updated
 import React, { useState, useEffect } from 'react';
-import { api } from '../../services/api';
+import { api, adminAPI } from '../../services/api';
+import ViewUserModal from './ViewUserModal';
+import EditUserModal from './EditUserModal';
+import '../../styles/userManagement.css';
 // import type { User } from '../../types';
 
 interface UserManagementProps {
@@ -25,6 +28,9 @@ const UserManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
+  const [viewingUser, setViewingUser] = useState<any | null>(null);
+  const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [loadingUser, setLoadingUser] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -131,6 +137,63 @@ const UserManagement: React.FC = () => {
     }
   };
 
+  const handleDeleteUser = async (userId: number, userEmail: string) => {
+    if (!window.confirm(`Are you sure you want to delete user: ${userEmail}?\n\nThis action cannot be undone. Users with voting history cannot be deleted.`)) {
+      return;
+    }
+
+    try {
+      setLoadingUser(true);
+      await adminAPI.deleteUser(userId);
+      alert('User deleted successfully');
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      alert(error.message || 'Failed to delete user');
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+
+  const handleViewUser = async (userId: number) => {
+    try {
+      setLoadingUser(true);
+      const userData = await adminAPI.getUser(userId);
+      setViewingUser(userData);
+    } catch (error: any) {
+      alert(`Error: ${error.message || 'Failed to load user details'}`);
+      console.error('Error loading user:', error);
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+
+  const handleEditUser = async (userId: number) => {
+    try {
+      setLoadingUser(true);
+      const userData = await adminAPI.getUser(userId);
+      setEditingUser(userData);
+    } catch (error: any) {
+      alert(`Error: ${error.message || 'Failed to load user details'}`);
+      console.error('Error loading user:', error);
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+
+  const handleUpdateUser = async (updatedData: any) => {
+    if (!editingUser) return;
+
+    try {
+      await adminAPI.updateUser(editingUser.id, updatedData);
+      setEditingUser(null);
+      fetchUsers(); // Refresh the list
+    } catch (error: any) {
+      alert(`Error: ${error.message || 'Failed to update user'}`);
+      console.error('Error updating user:', error);
+    }
+  };
+
   // Calculate paginated users
   const itemsPerPage = 20;
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -222,8 +285,27 @@ const UserManagement: React.FC = () => {
                 <td>{new Date(user.createdAt).toLocaleDateString()}</td>
                 <td>{user.voteCount}</td>
                 <td>
-                  <button className="btn-action btn-view">View</button>
-                  <button className="btn-action btn-edit">Edit</button>
+                  <button 
+                    className="btn-action btn-view"
+                    onClick={() => handleViewUser(user.id)}
+                    disabled={loadingUser}
+                  >
+                    View
+                  </button>
+                  <button 
+                    className="btn-action btn-edit"
+                    onClick={() => handleEditUser(user.id)}
+                    disabled={loadingUser}
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    className="btn-action btn-delete"
+                    onClick={() => handleDeleteUser(user.id, user.email)}
+                    disabled={loadingUser}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
@@ -285,6 +367,21 @@ const UserManagement: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {viewingUser && (
+        <ViewUserModal
+          user={viewingUser}
+          onClose={() => setViewingUser(null)}
+        />
+      )}
+
+      {editingUser && (
+        <EditUserModal
+          user={editingUser}
+          onClose={() => setEditingUser(null)}
+          onSave={handleUpdateUser}
+        />
+      )}
     </div>
   );
 };
