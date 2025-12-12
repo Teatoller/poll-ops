@@ -1,5 +1,5 @@
 // src/components/Register.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LocationSelector from './LocationSelector';
@@ -93,12 +93,12 @@ const Register: React.FC = () => {
     }
   };
 
-  const handleLocationSelect = (locationData: LocationData): void => {
+  const handleLocationSelect = useCallback((locationData: LocationData): void => {
     setFormData(prev => ({
       ...prev,
       ...locationData
     }));
-  };
+  }, []);
 
   return (
     <div className="register-container">
