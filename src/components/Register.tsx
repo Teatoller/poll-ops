@@ -62,7 +62,12 @@ const Register: React.FC = () => {
     setLoading(true);
     try {
       await register(formData);
-      navigate('/dashboard');
+      // Show success message and redirect
+      navigate('/login', { 
+        state: { 
+          message: 'Registration successful! Please check your email to verify your account.' 
+        } 
+      });
     } catch (error) {
       setErrors({ 
         submit: error instanceof Error ? error.message : 'Registration failed' 

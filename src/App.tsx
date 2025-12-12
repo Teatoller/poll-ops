@@ -18,6 +18,7 @@ import AdminLogin from './components/admin/AdminLogin';
 import { AdminProvider } from './contexts/AdminContext';
 import AdminSettings from './components/admin/AdminSettings';
 import AdminProtectedRoute from './components/admin/ProtectedRoute';
+import VerifyEmail from './components/VerifyEmail';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -43,6 +44,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/verify-email/:token" element={<VerifyEmail />} />
               <Route
                 path="/dashboard"
                 element={

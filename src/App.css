@@ -1,4 +1,107 @@
 /* src/App.css */
+.login-container,
+.verify-email-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+/* Email Verification Styles */
+.verify-email-card {
+  background: white;
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+.verify-email-card h2 {
+  margin: 1.5rem 0 1rem;
+  color: #333;
+  font-size: 1.75rem;
+}
+
+.verify-email-card p {
+  color: #666;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.spinner-large {
+  width: 60px;
+  height: 60px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+.success-icon,
+.error-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  margin: 0 auto 1rem;
+  font-weight: bold;
+}
+
+.success-icon {
+  background: #d4edda;
+  color: #155724;
+  border: 3px solid #28a745;
+}
+
+.error-icon {
+  background: #f8d7da;
+  color: #721c24;
+  border: 3px solid #dc3545;
+}
+
+.redirect-message {
+  color: #999;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+.action-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  background: #6c757d;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background 0.3s;
+  display: inline-block;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .login-container {
   min-height: 100vh;
   display: flex;
@@ -57,6 +160,17 @@
   font-size: 14px;
   margin-top: 5px;
   display: block;
+}
+
+.success-banner {
+  text-align: center;
+  margin: 0 0 20px 0;
+  padding: 12px;
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  border-radius: 6px;
+  font-weight: 500;
 }
 
 .submit-error {
