@@ -99,9 +99,8 @@ export interface LocationData {
 }
 
 export interface VoteData {
-  userId: number;
-  votes: { [pollId: number]: number };
-  pollingStation: string;
+  pollId: number;
+  candidateId: number;
 }
 
 
