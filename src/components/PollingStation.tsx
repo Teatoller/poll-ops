@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import type { Poll, Candidate } from '../types';
+import { api } from '../services/api';
+import type { Poll } from '../types';
 
 interface VoteSelection {
   [pollId: number]: number; // pollId -> candidateId
@@ -35,7 +36,6 @@ const PollingStation: React.FC = () => {
   useEffect(() => {
     if (!user) {
       navigate('/login');
-      return;
     }
   }, [user, navigate]);
 
@@ -55,18 +55,20 @@ const PollingStation: React.FC = () => {
 
     setSubmitting(true);
     try {
-      // Mock API call - replace with actual API
-      await mockSubmitVote({
-        userId: user!.id,
-        votes: selectedVotes,
-        pollingStation: user!.pollingStation
-      });
+      // Submit vote via API for each poll
+      for (const [pollIdStr, candidateId] of Object.entries(selectedVotes)) {
+        const pollId = Number.parseInt(pollIdStr);
+        await api.submitVote({
+          pollId,
+          candidateId
+        });
+      }
       
       navigate('/dashboard', { 
-        state: { message: 'Vote submitted successfully!' } 
+        state: { message: 'Vote submitted successfully!', refresh: true } 
       });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error submitting vote');
+    } catch (err: any) {
+      setError(err?.error || err?.message || 'Error submitting vote');
     } finally {
       setSubmitting(false);
     }
@@ -152,17 +154,6 @@ const PollingStation: React.FC = () => {
       </div>
     </div>
   );
-};
-
-// Mock function - replace with actual API call
-const mockSubmitVote = async (voteData: {
-  userId: number;
-  votes: VoteSelection;
-  pollingStation: string;
-}): Promise<void> => {
-  console.log('Submitting vote:', voteData);
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 2000));
 };
 
 export default PollingStation;

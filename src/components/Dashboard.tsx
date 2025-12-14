@@ -1,6 +1,6 @@
 // src/components/Dashboard.tsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import type { Poll } from '../types';
@@ -9,16 +9,18 @@ const Dashboard: React.FC = () => {
   const [activePolls, setActivePolls] = useState<Poll[]>([]);
   const [userVotes, setUserVotes] = useState<{ [pollId: number]: boolean }>({});
   const [loading, setLoading] = useState<boolean>(true);
+  const [successMessage, setSuccessMessage] = useState<string>('');
   const [stats, setStats] = useState({
     activePolls: 0,
     votedPolls: 0,
     remainingPolls: 0
   });
 
-  console.log("acttive", activePolls)
-  
+  console.log("stats>>>", stats)
+
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!user) {
@@ -26,6 +28,15 @@ const Dashboard: React.FC = () => {
       return;
     }
     fetchDashboardData();
+    
+    // Check if returning from voting with success message
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+      // Clear the navigation state
+      navigate(location.pathname, { replace: true, state: {} });
+      // Clear message after 5 seconds
+      setTimeout(() => setSuccessMessage(''), 5000);
+    }
   }, [user, navigate]);
 
   const fetchDashboardData = async (): Promise<void> => {
@@ -49,7 +60,7 @@ const Dashboard: React.FC = () => {
       setUserVotes(votes);
       
       // 3. Calculate stats
-      const votedCount = Object.values(votes).filter(voted => voted).length;
+      const votedCount = Object.values(votes).filter(Boolean).length;
       setStats({
         activePolls: polls.length,
         votedPolls: votedCount,
@@ -111,6 +122,12 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </header>
+
+      {successMessage && (
+        <div className="success-banner">
+          {successMessage}
+        </div>
+      )}
 
       <div className="dashboard-content">
         <div className="user-profile-card">
@@ -200,7 +217,7 @@ const Dashboard: React.FC = () => {
           <h3>Quick Stats</h3>
           <div className="stats-grid">
             <div className="stat-card">
-              <span className="stat-number">{stats.activePolls}</span>
+              <span className="stat-number">{stats.activePolls}k</span>
               <span className="stat-label">Active Polls</span>
             </div>
             <div className="stat-card">

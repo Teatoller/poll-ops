@@ -1,6 +1,6 @@
 // src/components/Login.tsx
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import type { LoginData } from '../types';
 
@@ -11,15 +11,25 @@ const Login: React.FC = () => {
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string>('');
   
   const { login, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (user) {
       navigate('/dashboard');
     }
-  }, [user, navigate]);
+    
+    // Check for success message from email verification
+    const state = location.state as { message?: string } | null;
+    if (state?.message) {
+      setSuccessMessage(state.message);
+      // Clear the message from location state
+      navigate(location.pathname, { replace: true });
+    }
+  }, [user, navigate, location]);
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
@@ -78,6 +88,12 @@ const Login: React.FC = () => {
     <div className="login-container">
       <div className="login-form">
         <h2>Sign In to Your Account</h2>
+        
+        {successMessage && (
+          <div className="success-banner">
+            {successMessage}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
