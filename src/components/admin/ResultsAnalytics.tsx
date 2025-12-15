@@ -30,7 +30,12 @@ ChartJS.register(
 
 interface AnalyticsData {
   dailyVotes: Array<{ date: string; count: number }>;
-  pollParticipation: Array<{ pollName: string; participation: number }>;
+  pollParticipation: Array<{
+    poll_id: number;
+    poll_name: string;
+    voter_count: number;
+    participation_rate: number;
+  }>;
   locationDistribution: Array<{ county: string; votes: number }>;
   userActivity: Array<{ hour: number; activity: number }>;
 }
@@ -39,14 +44,13 @@ const ResultsAnalytics: React.FC = () => {
   const location = useLocation();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState('7d');
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('7d');
   const [selectedPollId, setSelectedPollId] = useState<number | null>(
     location.state?.pollId || null
   );
   const [polls, setPolls] = useState<Array<{ id: number; officeName: string }>>([]);
 
   useEffect(() => {
-    // Update selected poll if navigation state changes
     if (location.state?.pollId) {
       setSelectedPollId(location.state.pollId);
     }
@@ -71,8 +75,6 @@ const ResultsAnalytics: React.FC = () => {
 
   const fetchAnalytics = async () => {
     try {
-      // You'll need to create this endpoint
-      // Pass selectedPollId as a query parameter
       const data = await api.getAnalytics(timeRange, selectedPollId || undefined);
       setAnalytics(data);
     } catch (error) {
@@ -98,11 +100,11 @@ const ResultsAnalytics: React.FC = () => {
   };
 
   const pollParticipationData = {
-    labels: analytics?.pollParticipation.map(p => p.pollName),
+    labels: analytics?.pollParticipation.map(p => p.poll_name),
     datasets: [
       {
         label: 'Participation Rate (%)',
-        data: analytics?.pollParticipation.map(p => p.participation),
+        data: analytics?.pollParticipation.map(p => p.participation_rate),
         backgroundColor: [
           'rgba(255, 99, 132, 0.8)',
           'rgba(54, 162, 235, 0.8)',
@@ -158,30 +160,30 @@ const ResultsAnalytics: React.FC = () => {
             </select>
           </div>
           <div className="time-range-selector">
-          <button 
-            onClick={() => setTimeRange('7d')} 
-            className={timeRange === '7d' ? 'active' : ''}
-          >
-            7 Days
-          </button>
-          <button 
-            onClick={() => setTimeRange('30d')} 
-            className={timeRange === '30d' ? 'active' : ''}
-          >
-            30 Days
-          </button>
-          <button 
-            onClick={() => setTimeRange('90d')} 
-            className={timeRange === '90d' ? 'active' : ''}
-          >
-            90 Days
-          </button>
-          <button 
-            onClick={() => setTimeRange('1y')} 
-            className={timeRange === '1y' ? 'active' : ''}
-          >
-            1 Year
-          </button>
+            <button 
+              onClick={() => setTimeRange('7d')} 
+              className={timeRange === '7d' ? 'active' : ''}
+            >
+              7 Days
+            </button>
+            <button 
+              onClick={() => setTimeRange('30d')} 
+              className={timeRange === '30d' ? 'active' : ''}
+            >
+              30 Days
+            </button>
+            <button 
+              onClick={() => setTimeRange('90d')} 
+              className={timeRange === '90d' ? 'active' : ''}
+            >
+              90 Days
+            </button>
+            <button 
+              onClick={() => setTimeRange('1y')} 
+              className={timeRange === '1y' ? 'active' : ''}
+            >
+              1 Year
+            </button>
           </div>
         </div>
       </div>
@@ -212,32 +214,38 @@ const ResultsAnalytics: React.FC = () => {
         <div className="summary-card">
           <h4>Total Votes</h4>
           <p className="summary-number">
-            {analytics?.dailyVotes.reduce((sum, day) => sum + day.count, 0).toLocaleString()}
+            {analytics ? analytics.dailyVotes.reduce((sum, day) => sum + day.count, 0).toLocaleString() : '0'}
           </p>
         </div>
         <div className="summary-card">
           <h4>Average Daily Votes</h4>
           <p className="summary-number">
-            {Math.round(
-              analytics?.dailyVotes.reduce((sum, day) => sum + day.count, 0) / 
-              (analytics?.dailyVotes.length || 1)
-            ).toLocaleString()}
+            {analytics 
+              ? Math.round(
+                  analytics.dailyVotes.reduce((sum, day) => sum + day.count, 0) / 
+                  (analytics.dailyVotes.length || 1)
+                ).toLocaleString()
+              : '0'}
           </p>
         </div>
         <div className="summary-card">
           <h4>Peak Voting Hour</h4>
           <p className="summary-number">
-            {analytics?.userActivity.reduce((max, curr, i, arr) => 
-              curr.activity > arr[max].activity ? i : max, 0
-            )}:00
+            {analytics
+              ? analytics.userActivity.reduce((max, curr, i, arr) => 
+                  curr.activity > arr[max].activity ? i : max, 0
+                ) + ':00'
+              : 'N/A'}
           </p>
         </div>
         <div className="summary-card">
           <h4>Most Active County</h4>
           <p className="summary-number">
-            {analytics?.locationDistribution.reduce((max, curr) => 
-              curr.votes > max.votes ? curr : max
-            ).county}
+            {analytics && analytics.locationDistribution.length > 0
+              ? analytics.locationDistribution.reduce((max, curr) => 
+                  curr.votes > max.votes ? curr : max
+                ).county
+              : 'N/A'}
           </p>
         </div>
       </div>
