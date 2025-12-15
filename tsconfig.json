@@ -12,5 +12,7 @@
     // Remove or set to false:
     "verbatimModuleSyntax": false,
     // OR keep it and ensure all type imports use 'import type'
+    "forceConsistentCasingInFileNames": true,
+    "strict": true
   }
 }
