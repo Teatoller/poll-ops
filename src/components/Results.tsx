@@ -48,8 +48,6 @@ const Results: React.FC = () => {
   const location = useLocation();
   const { pollId } = useParams<{ pollId: string }>();
 
-  console.log("pollResults>>", pollResults)
-
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -81,7 +79,6 @@ const Results: React.FC = () => {
 
       // Fetch results from API
       const results = await api.getPollResults(resultsPollId);
-      console.log("iko poll kwa result---", results)
       setPollResults(results);
       
     } catch (err) {
