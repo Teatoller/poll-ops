@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
-import type { Poll, Candidate } from '../types';
+import type { Poll } from '../types';
 
 interface PollResults {
   poll: {
@@ -48,8 +48,6 @@ const Results: React.FC = () => {
   const location = useLocation();
   const { pollId } = useParams<{ pollId: string }>();
 
-  console.log("pollResults>>", pollResults)
-
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -81,7 +79,6 @@ const Results: React.FC = () => {
 
       // Fetch results from API
       const results = await api.getPollResults(resultsPollId);
-      console.log("iko poll kwa result---", results)
       setPollResults(results);
       
     } catch (err) {
@@ -133,10 +130,10 @@ const Results: React.FC = () => {
     await fetchPollResults();
   };
 
-  const calculatePercentage = (voteCount: number, totalVotes: number): number => {
-    if (totalVotes === 0) return 0;
-    return (voteCount / totalVotes) * 100;
-  };
+  // const calculatePercentage = (voteCount: number, totalVotes: number): number => {
+  //   if (totalVotes === 0) return 0;
+  //   return (voteCount / totalVotes) * 100;
+  // };
 
   if (loading) {
     return (

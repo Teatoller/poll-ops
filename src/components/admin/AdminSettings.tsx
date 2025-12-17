@@ -181,6 +181,7 @@ const AdminSettings: React.FC = () => {
                     ...settings,
                     voting: { ...settings.voting, votingHoursStart: e.target.value }
                   })}
+                  title="Set the time when voting hours begin"
                 />
               </div>
 
@@ -193,6 +194,7 @@ const AdminSettings: React.FC = () => {
                     ...settings,
                     voting: { ...settings.voting, votingHoursEnd: e.target.value }
                   })}
+                  title="Set the time when voting hours end"
                 />
               </div>
 
@@ -204,6 +206,7 @@ const AdminSettings: React.FC = () => {
                     ...settings,
                     voting: { ...settings.voting, maxVotesPerUser: parseInt(e.target.value) }
                   })}
+                  title="Select maximum number of votes allowed per user"
                 >
                   <option value="1">1 vote per poll</option>
                   <option value="2">2 votes per poll</option>
@@ -540,6 +543,7 @@ const AdminSettings: React.FC = () => {
                     ...settings,
                     security: { ...settings.security, passwordMinLength: Number.parseInt(e.target.value) }
                   })}
+                  title="Set the minimum number of characters required for passwords"
                 />
                 <p className="setting-description">
                   Minimum number of characters required

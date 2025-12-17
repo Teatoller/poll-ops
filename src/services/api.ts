@@ -447,7 +447,7 @@ export const api = {
   },
 
   // Toggle poll active status - MISSING
-  togglePollActive: async (pollId: number, isActive: boolean): Promise<any> => {
+  togglePollActive: async (pollId: number, _isActive: boolean): Promise<any> => {
     // Note: The backend endpoint doesn't need the isActive parameter
     // It toggles whatever the current state is
     return adminAPI.togglePollStatus(pollId);
