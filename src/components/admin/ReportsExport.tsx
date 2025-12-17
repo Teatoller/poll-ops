@@ -1,5 +1,5 @@
 // src/components/admin/ReportsExport.tsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 

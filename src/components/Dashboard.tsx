@@ -16,8 +16,6 @@ const Dashboard: React.FC = () => {
     remainingPolls: 0
   });
 
-  console.log("stats>>>", stats)
-
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();

@@ -27,7 +27,7 @@ const UserManagement: React.FC = () => {
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalUsers, setTotalUsers] = useState(0);
+  const [, setTotalUsers] = useState(0);
   const [viewingUser, setViewingUser] = useState<any | null>(null);
   const [editingUser, setEditingUser] = useState<any | null>(null);
   const [loadingUser, setLoadingUser] = useState(false);
