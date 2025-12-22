@@ -1,6 +1,7 @@
 // src/components/LocationSelector.tsx
 import React, { useState, useEffect } from 'react';
 import type { LocationData } from '../../types';
+import { countryTree } from './CountryTree';
 
 interface LocationSelectorProps {
   onSelect: (locationData: LocationData) => void;
@@ -19,72 +20,115 @@ interface County {
   divisions: Division[];
 }
 
+
+
 // Mock data - replace with actual API calls
-const locationData: County[] = [
-  {
-    id: 1,
-    name: 'Nairobi',
-    divisions: [
-      {
-        id: 1,
-        name: 'Westlands',
-        pollingStations: ['Station A', 'Station B', 'Station C']
-      },
-      {
-        id: 2,
-        name: 'Dagoretti',
-        pollingStations: ['Station D', 'Station E', 'Station F']
-      }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Mombasa',
-    divisions: [
-      {
-        id: 3,
-        name: 'Mvita',
-        pollingStations: ['Station G', 'Station H', 'Station I']
-      }
-    ]
-  }
-];
+// const locationData: County[] = [
+//   {
+//     id: 1,
+//     name: 'Nairobi',
+//     divisions: [
+//       {
+//         id: 1,
+//         name: 'Westlands',
+//         pollingStations: ['Station A', 'Station B', 'Station C']
+//       },
+//       {
+//         id: 2,
+//         name: 'Dagoretti',
+//         pollingStations: ['Station D', 'Station E', 'Station F']
+//       }
+//     ]
+//   },
+//   {
+//     id: 2,
+//     name: 'Mombasa',
+//     divisions: [
+//       {
+//         id: 3,
+//         name: 'Mvita',
+//         pollingStations: ['Station G', 'Station H', 'Station I']
+//       }
+//     ]
+//   }
+// ];
+
+
+interface PollingStation {
+  name: string;
+}
+
+interface Ward {
+  id: number;
+  name: string;
+  pollingStations: string[];
+}
+
+interface SubCounty {
+  id: number;
+  name: string;
+  wards: Ward[];
+}
+
+interface County {
+  id: number;
+  name: string;
+  subCounties: SubCounty[];
+}
+
 
 const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, errors }) => {
-  const [selectedCounty, setSelectedCounty] = useState<string>('');
-  const [selectedDivision, setSelectedDivision] = useState<string>('');
-  const [selectedPollingStation, setSelectedPollingStation] = useState<string>('');
-  const [divisions, setDivisions] = useState<Division[]>([]);
-  const [pollingStations, setPollingStations] = useState<string[]>([]);
+  // const [selectedCounty, setSelectedCounty] = useState<string>('');
+  // const [selectedDivision, setSelectedDivision] = useState<string>('');
+  // const [selectedPollingStation, setSelectedPollingStation] = useState<string>('');
+  // const [divisions, setDivisions] = useState<Division[]>([]);
+  // const [pollingStations, setPollingStations] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (selectedCounty) {
-      const county = locationData.find(c => c.name === selectedCounty);
-      setDivisions(county ? county.divisions : []);
-      setSelectedDivision('');
-      setSelectedPollingStation('');
-    }
-  }, [selectedCounty]);
+  const [county, setCounty] = useState<County | null>(null);
+  const [subCounty, setSubCounty] = useState<SubCounty | null>(null);
+  const [ward, setWard] = useState<Ward | null>(null);
+  const [pollingStation, setPollingStation] = useState('');
 
-  useEffect(() => {
-    if (selectedDivision) {
-      const division = divisions.find(d => d.name === selectedDivision);
-      setPollingStations(division ? division.pollingStations : []);
-      setSelectedPollingStation('');
-    }
-  }, [selectedDivision, divisions]);
+  // useEffect(() => {
+  //   if (selectedCounty) {
+  //     const county = locationData.find(c => c.name === selectedCounty);
+  //     setDivisions(county ? county.divisions : []);
+  //     setSelectedDivision('');
+  //     setSelectedPollingStation('');
+  //   }
+  // }, [selectedCounty]);
+
+  // useEffect(() => {
+  //   if (selectedDivision) {
+  //     const division = divisions.find(d => d.name === selectedDivision);
+  //     setPollingStations(division ? division.pollingStations : []);
+  //     setSelectedPollingStation('');
+  //   }
+  // }, [selectedDivision, divisions]);
+
+  // useEffect(() => {
+  //   onSelect({
+  //     county: selectedCounty,
+  //     division: selectedDivision,
+  //     pollingStation: selectedPollingStation
+  //   });
+  // }, [selectedCounty, selectedDivision, selectedPollingStation, onSelect]);
 
   useEffect(() => {
     onSelect({
-      county: selectedCounty,
-      division: selectedDivision,
-      pollingStation: selectedPollingStation
+      countyId: county?.id ?? null,
+      countyName: county?.name ?? '',
+      subCountyId: subCounty?.id ?? null,
+      subCountyName: subCounty?.name ?? '',
+      wardId: ward?.id ?? null,
+      wardName: ward?.name ?? '',
+      pollingStation
     });
-  }, [selectedCounty, selectedDivision, selectedPollingStation, onSelect]);
+  }, [county, subCounty, ward, pollingStation, onSelect]);
 
   return (
     <div className="location-selector">
-      <div className="form-group">
+      {/* <div className="form-group">
         <label htmlFor="county">County *</label>
         <select
           id="county"
@@ -143,7 +187,78 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, errors })
         {errors.pollingStation && (
           <span className="error-message">{errors.pollingStation}</span>
         )}
+      </div> */}
+
+      <div className="form-group">
+        <label>County *</label>
+        <select
+          value={county?.id ?? ''}
+          onChange={(e) => {
+            const selected = countryTree.find(c => c.id === Number(e.target.value)) || null;
+            setCounty(selected);
+            setSubCounty(null);
+            setWard(null);
+            setPollingStation('');
+          }}
+        >
+          <option value="">Select County</option>
+          {countryTree.map(c => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
       </div>
+
+      <div className="form-group">
+        <label>Sub County *</label>
+        <select
+          value={subCounty?.id ?? ''}
+          disabled={!county}
+          onChange={(e) => {
+            const selected = county?.subCounties.find(sc => sc.id === Number(e.target.value)) || null;
+            setSubCounty(selected);
+            setWard(null);
+            setPollingStation('');
+          }}
+        >
+          <option value="">Select Sub County</option>
+          {county?.subCounties.map(sc => (
+            <option key={sc.id} value={sc.id}>{sc.name}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label>Ward *</label>
+        <select
+          value={ward?.id ?? ''}
+          disabled={!subCounty}
+          onChange={(e) => {
+            const selected = subCounty?.wards.find(w => w.id === Number(e.target.value)) || null;
+            setWard(selected);
+            setPollingStation('');
+          }}
+        >
+          <option value="">Select Ward</option>
+          {subCounty?.wards.map(w => (
+            <option key={w.id} value={w.id}>{w.name}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label>Polling Station *</label>
+        <select
+          value={pollingStation}
+          disabled={!ward}
+          onChange={(e) => setPollingStation(e.target.value)}
+        >
+          <option value="">Select Polling Station</option>
+          {ward?.pollingStations.map(ps => (
+            <option key={ps} value={ps}>{ps}</option>
+          ))}
+        </select>
+      </div>
+
     </div>
   );
 };
