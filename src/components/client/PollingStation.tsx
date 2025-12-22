@@ -1,9 +1,9 @@
 // src/components/PollingStation.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { api } from '../services/api';
-import type { Poll } from '../types';
+import { useAuth } from '../../contexts/AuthContext';
+import { api } from '../../services/api';
+import type { Poll } from '../../types';
 
 interface VoteSelection {
   [pollId: number]: number; // pollId -> candidateId

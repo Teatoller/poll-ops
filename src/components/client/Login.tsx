@@ -1,8 +1,8 @@
 // src/components/Login.tsx
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import type { LoginData } from '../types';
+import { useAuth } from '../../contexts/AuthContext';
+import type { LoginData } from '../../types';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState<LoginData>({

@@ -1,9 +1,9 @@
 // src/components/Register.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import LocationSelector from './LocationSelector';
-import type { LocationData, RegisterData } from '../types';
+import type { LocationData, RegisterData } from '../../types';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState<RegisterData>({

@@ -1,6 +1,6 @@
 // src/components/LocationSelector.tsx
 import React, { useState, useEffect } from 'react';
-import type { LocationData } from '../types';
+import type { LocationData } from '../../types';
 
 interface LocationSelectorProps {
   onSelect: (locationData: LocationData) => void;

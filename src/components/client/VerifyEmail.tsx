@@ -1,7 +1,7 @@
 // src/components/VerifyEmail.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { api } from '../services/api';
+import { api } from '../../services/api';
 
 const VerifyEmail: React.FC = () => {
   const { token } = useParams<{ token: string }>();
