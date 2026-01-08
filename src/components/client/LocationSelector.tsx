@@ -1,7 +1,7 @@
 // src/components/LocationSelector.tsx
 import React, { useState, useEffect } from 'react';
 import type { LocationData } from '../../types';
-import { countryTree } from './CountryTree';
+import { resourcesAPI } from '../../services/api';
 
 interface LocationSelectorProps {
   onSelect: (locationData: LocationData) => void;
@@ -84,10 +84,24 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, errors })
   // const [divisions, setDivisions] = useState<Division[]>([]);
   // const [pollingStations, setPollingStations] = useState<string[]>([]);
 
+  const [tree, setTree] = useState<County[]>([]);
   const [county, setCounty] = useState<County | null>(null);
   const [subCounty, setSubCounty] = useState<SubCounty | null>(null);
   const [ward, setWard] = useState<Ward | null>(null);
   const [pollingStation, setPollingStation] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await resourcesAPI.getCountryTree();
+        if (mounted) setTree(data as unknown as County[]);
+      } catch (e) {
+        console.error('Failed to load location tree', e);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   // useEffect(() => {
   //   if (selectedCounty) {
@@ -194,7 +208,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, errors })
         <select
           value={county?.id ?? ''}
           onChange={(e) => {
-            const selected = countryTree.find(c => c.id === Number(e.target.value)) || null;
+            const selected = tree.find(c => c.id === Number(e.target.value)) || null;
             setCounty(selected);
             setSubCounty(null);
             setWard(null);
@@ -202,7 +216,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, errors })
           }}
         >
           <option value="">Select County</option>
-          {countryTree.map(c => (
+          {tree.map(c => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>

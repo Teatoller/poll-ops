@@ -509,6 +509,28 @@ export const api = {
   },
 };
 
+// Resources API
+export const resourcesAPI = {
+  getCounties: async (): Promise<Array<{ id: number; name: string; code?: string }>> => {
+    return apiFetch('/resources/counties');
+  },
+  getSubCounties: async (countyId?: number): Promise<Array<{ id: number; countyId: number; name: string; code?: string }>> => {
+    const qp = countyId ? `?countyId=${countyId}` : '';
+    return apiFetch(`/resources/sub-counties${qp}`);
+  },
+  getWards: async (subCountyId?: number): Promise<Array<{ id: number; subCountyId: number; name: string; code?: string }>> => {
+    const qp = subCountyId ? `?subCountyId=${subCountyId}` : '';
+    return apiFetch(`/resources/wards${qp}`);
+  },
+  getPollingStations: async (wardId?: number): Promise<Array<{ id: number; wardId: number; name: string; code?: string }>> => {
+    const qp = wardId ? `?wardId=${wardId}` : '';
+    return apiFetch(`/resources/polling-stations${qp}`);
+  },
+  getCountryTree: async (): Promise<Array<{ id: number; name: string; subCounties: any[] }>> => {
+    return apiFetch('/resources/country-tree');
+  },
+};
+
 // Export types
 export type {
   LoginData,
