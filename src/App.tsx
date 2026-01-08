@@ -20,6 +20,8 @@ import AdminSettings from './components/admin/AdminSettings';
 import AdminProtectedRoute from './components/admin/ProtectedRoute';
 import VerifyEmail from './components/client/VerifyEmail';
 import Dashboard from './components/client/Dashboard';
+import SurveyVoting from './components/client/SurveyVoting';
+import SurveyResults from './components/client/SurveyResults';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -67,6 +69,22 @@ const App: React.FC = () => {
                 element={
                   <ProtectedRoute>
                     <Results />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/survey-voting"
+                element={
+                  <ProtectedRoute>
+                    <SurveyVoting />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/survey-results"
+                element={
+                  <ProtectedRoute>
+                    <SurveyResults />
                   </ProtectedRoute>
                 }
               />

@@ -8,7 +8,9 @@ import type {
   User,
   AdminAnalytics,
   ExportFormat,
-  DashboardStatistics
+  DashboardStatistics,
+  SurveyPoll,
+  SurveyResults
 } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -366,6 +368,103 @@ export const adminAPI = {
   },
 };
 
+// Survey API methods - MUST be defined before main api object
+export const surveyAPI = {
+  // Admin: Get all surveys (with optional filters)
+  getAdminSurveys: async (filters?: {
+    scope?: string;
+    isActive?: boolean;
+  }): Promise<SurveyPoll[]> => {
+    const params = new URLSearchParams();
+    if (filters?.scope) params.append('scope', filters.scope);
+    if (filters?.isActive !== undefined) params.append('is_active', String(filters.isActive));
+
+    const queryString = params.toString();
+    return adminApiFetch(`/admin/surveys${queryString ? `?${queryString}` : ''}`);
+  },
+
+  // Create a new survey (admin only)
+  createSurvey: async (surveyData: {
+    question: string;
+    description?: string;
+    startDate: string;
+    endDate: string;
+    scope: string;
+    countyId?: number;
+    subCountyId?: number;
+    wardId?: number;
+    options: Array<{ optionText: string }>;
+  }): Promise<SurveyPoll> => {
+    return adminApiFetch('/admin/surveys', {
+      method: 'POST',
+      body: JSON.stringify(surveyData),
+    });
+  },
+
+  // Get all surveys (with optional filters)
+  getSurveys: async (filters?: {
+    scope?: string;
+    isActive?: boolean;
+    countyId?: number;
+  }): Promise<SurveyPoll[]> => {
+    const params = new URLSearchParams();
+    if (filters?.scope) params.append('scope', filters.scope);
+    if (filters?.isActive !== undefined) params.append('is_active', String(filters.isActive));
+    if (filters?.countyId) params.append('county_id', String(filters.countyId));
+    
+    const queryString = params.toString();
+    return apiFetch(`/surveys${queryString ? `?${queryString}` : ''}`);
+  },
+
+  // Get survey by ID
+  getSurveyById: async (surveyId: number): Promise<SurveyPoll> => {
+    return apiFetch(`/surveys/${surveyId}`);
+  },
+
+  // Check if user has already voted in a survey
+  checkSurveyVoteStatus: async (surveyId: number): Promise<{ hasVoted: boolean; optionId?: number }> => {
+    return apiFetch(`/surveys/${surveyId}/vote-status`);
+  },
+
+  // Submit a survey vote
+  submitSurveyVote: async (voteData: {
+    surveyId: number;
+    optionId: number;
+  }): Promise<{ message: string; vote: any }> => {
+    return apiFetch('/surveys/vote', {
+      method: 'POST',
+      body: JSON.stringify(voteData),
+    });
+  },
+
+  // Get survey results
+  getSurveyResults: async (surveyId: number): Promise<SurveyResults> => {
+    return apiFetch(`/surveys/${surveyId}/results`);
+  },
+
+  // Admin: Update survey
+  updateSurvey: async (surveyId: number, surveyData: Partial<SurveyPoll>): Promise<SurveyPoll> => {
+    return adminApiFetch(`/admin/surveys/${surveyId}`, {
+      method: 'PUT',
+      body: JSON.stringify(surveyData),
+    });
+  },
+
+  // Admin: Toggle survey active status
+  toggleSurveyStatus: async (surveyId: number): Promise<{ message: string; is_active: boolean }> => {
+    return adminApiFetch(`/admin/surveys/${surveyId}/toggle`, {
+      method: 'PATCH',
+    });
+  },
+
+  // Admin: Delete survey
+  deleteSurvey: async (surveyId: number): Promise<{ message: string }> => {
+    return adminApiFetch(`/admin/surveys/${surveyId}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
 // Main API service for regular users
 export const api = {
   // Auth endpoints
@@ -444,6 +543,19 @@ export const api = {
   checkVoteStatus: async (pollId: number): Promise<{ hasVoted: boolean }> => {
     return apiFetch(`/polls/has-voted/${pollId}`);
   },
+
+  // Survey endpoints
+  getSurveys: surveyAPI.getSurveys,
+  getSurveyById: surveyAPI.getSurveyById,
+  checkSurveyVoteStatus: surveyAPI.checkSurveyVoteStatus,
+  submitSurveyVote: surveyAPI.submitSurveyVote,
+  getSurveyResults: surveyAPI.getSurveyResults,
+  createSurvey: surveyAPI.createSurvey,
+  getAdminSurveys: surveyAPI.getAdminSurveys,
+  updateSurvey: surveyAPI.updateSurvey,
+  toggleSurveyStatus: surveyAPI.toggleSurveyStatus,
+  toggleSurveyActive: surveyAPI.toggleSurveyStatus, // alias for clarity in admin UI
+  deleteSurvey: surveyAPI.deleteSurvey,
 
   // Results endpoints
   getPollResults: async (pollId: number): Promise<any> => {
@@ -557,5 +669,7 @@ export type {
   User,
   AdminAnalytics,
   ExportFormat,
-  DashboardStatistics
+  DashboardStatistics,
+  SurveyPoll,
+  SurveyResults
 };

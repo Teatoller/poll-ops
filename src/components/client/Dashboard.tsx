@@ -2,18 +2,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import type { Poll } from '../../types';
+import type { Poll, SurveyPoll } from '../../types';
 import { api } from '../../services/api';
 
 const Dashboard: React.FC = () => {
   const [activePolls, setActivePolls] = useState<Poll[]>([]);
+  const [activeSurveys, setActiveSurveys] = useState<SurveyPoll[]>([]);
   const [userVotes, setUserVotes] = useState<{ [pollId: number]: boolean }>({});
+  const [userSurveyVotes, setUserSurveyVotes] = useState<{ [surveyId: number]: boolean }>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [stats, setStats] = useState({
     activePolls: 0,
+    activeSurveys: 0,
     votedPolls: 0,
-    remainingPolls: 0
+    votedSurveys: 0,
+    remainingPolls: 0,
+    remainingSurveys: 0
   });
 
   const { user, logout } = useAuth();
@@ -45,7 +50,11 @@ const Dashboard: React.FC = () => {
       const polls = await api.getActivePolls();
       setActivePolls(polls);
       
-      // 2. Check vote status for each poll
+      // 2. Fetch active surveys
+      const surveys = await api.getSurveys({ isActive: true });
+      setActiveSurveys(surveys);
+      
+      // 3. Check vote status for each poll
       const votes: { [pollId: number]: boolean } = {};
       for (const poll of polls) {
         try {
@@ -57,13 +66,24 @@ const Dashboard: React.FC = () => {
         }
       }
       setUserVotes(votes);
+
+      // 4. Check vote status for each survey
+      const surveyVotes: { [surveyId: number]: boolean } = {};
+      for (const survey of surveys) {
+        surveyVotes[survey.id] = survey.hasVoted || false;
+      }
+      setUserSurveyVotes(surveyVotes);
       
-      // 3. Calculate stats
+      // 5. Calculate stats
       const votedCount = Object.values(votes).filter(Boolean).length;
+      const votedSurveyCount = Object.values(surveyVotes).filter(Boolean).length;
       setStats({
         activePolls: polls.length,
+        activeSurveys: surveys.length,
         votedPolls: votedCount,
-        remainingPolls: polls.length - votedCount
+        votedSurveys: votedSurveyCount,
+        remainingPolls: polls.length - votedCount,
+        remainingSurveys: surveys.length - votedSurveyCount
       });
       
     } catch (error) {
@@ -83,6 +103,18 @@ const Dashboard: React.FC = () => {
 
   const handleViewResults = (poll: Poll): void => {
     navigate('/results', { state: { poll } });
+  };
+
+  const handleSurveyClick = (survey: SurveyPoll): void => {
+    if (userSurveyVotes[survey.id]) {
+      navigate('/survey-results', { state: { surveyId: survey.id } });
+    } else {
+      navigate('/survey-voting', { state: { survey } });
+    }
+  };
+
+  const handleViewSurveyResults = (survey: SurveyPoll): void => {
+    navigate('/survey-results', { state: { surveyId: survey.id } });
   };
 
   const handleLogout = (): void => {
@@ -215,11 +247,89 @@ const Dashboard: React.FC = () => {
           )}
         </div>
 
+        <div className="polls-section">
+          <div className="section-header">
+            <h2>Active Surveys</h2>
+            <span className="polls-count">{activeSurveys.length} surveys</span>
+          </div>
+          
+          {activeSurveys.length === 0 ? (
+            <div className="no-polls">
+              <p>No active surveys at the moment.</p>
+            </div>
+          ) : (
+            <div className="polls-grid">
+              {activeSurveys.map(survey => (
+                <div key={survey.id} className="poll-card survey-card">
+                  <div className="poll-header">
+                    <h3>{survey.question}</h3>
+                    <span className={`poll-status ${survey.is_active ? 'active' : 'ended'}`}>
+                      {survey.is_active ? 'Active' : 'Ended'}
+                    </span>
+                  </div>
+                  
+                  {survey.description && (
+                    <p className="poll-description">{survey.description}</p>
+                  )}
+                  
+                  <div className="poll-details">
+                    <div className="detail-item">
+                      <span className="label">Scope:</span>
+                      <span className="value">{survey.scope}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Options:</span>
+                      <span className="value">{survey.options.length}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Total Votes:</span>
+                      <span className="value">{survey.totalVotes || 0}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">End Date:</span>
+                      <span className="value">{new Date(survey.endDate).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="poll-actions">
+                    <button
+                      onClick={() => handleSurveyClick(survey)}
+                      className="action-button primary"
+                      disabled={!survey.is_active}
+                    >
+                      {userSurveyVotes[survey.id] ? 'View Your Response' : 'Participate'}
+                    </button>
+                    
+                    <button
+                      onClick={() => handleViewSurveyResults(survey)}
+                      className="action-button secondary"
+                    >
+                      View Results
+                    </button>
+                  </div>
+
+                  {userSurveyVotes[survey.id] && (
+                    <div className="voted-badge">
+                      ✓ You have participated in this survey
+                    </div>
+                  )}
+
+                  {!survey.is_active && (
+                    <div className="ended-badge">
+                      Survey has ended
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="quick-stats">
           <h3>Quick Stats</h3>
           <div className="stats-grid">
             <div className="stat-card">
-              <span className="stat-number">{stats.activePolls}k</span>
+              <span className="stat-number">{stats.activePolls}</span>
               <span className="stat-label">Active Polls</span>
             </div>
             <div className="stat-card">
@@ -227,8 +337,12 @@ const Dashboard: React.FC = () => {
               <span className="stat-label">Polls Voted In</span>
             </div>
             <div className="stat-card">
-              <span className="stat-number">{stats.remainingPolls}</span>
-              <span className="stat-label">Polls Remaining</span>
+              <span className="stat-number">{stats.activeSurveys}</span>
+              <span className="stat-label">Active Surveys</span>
+            </div>
+            <div className="stat-card">
+              <span className="stat-number">{stats.votedSurveys}</span>
+              <span className="stat-label">Surveys Completed</span>
             </div>
           </div>
         </div>
