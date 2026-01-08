@@ -70,16 +70,35 @@ export interface Admin {
   role: string;
 }
 
-export interface RegisterData {
+// export interface RegisterData {
+//   nationalId: string;
+//   email: string;
+//   phone: string;
+//   password: string;
+//   confirmPassword: string;
+//   county: string;
+//   division: string;
+//   pollingStation: string;
+// }
+
+export interface LocationData {
+  countyId: number | null;
+  countyName: string;
+  subCountyId: number | null;
+  subCountyName: string;
+  wardId: number | null;
+  wardName: string;
+  pollingStation: string;
+}
+
+export interface RegisterData extends LocationData {
   nationalId: string;
   email: string;
   phone: string;
   password: string;
   confirmPassword: string;
-  county: string;
-  division: string;
-  pollingStation: string;
 }
+
 
 export interface LoginData {
   email: string;
@@ -92,11 +111,11 @@ export interface ApiResponse<T = any> {
   error?: string;
 }
 
-export interface LocationData {
-  county: string;
-  division: string;
-  pollingStation: string;
-}
+// export interface LocationData {
+//   county: string;
+//   division: string;
+//   pollingStation: string;
+// }
 
 export interface VoteData {
   pollId: number;
@@ -173,7 +192,7 @@ export interface SystemSettings {
     allowVoteEditing: boolean;
     voteEditingDeadline: number; // hours before poll ends
   };
-  
+
   // Registration Settings
   registration: {
     requireEmailVerification: boolean;
@@ -182,7 +201,7 @@ export interface SystemSettings {
     allowMultipleRegistrations: boolean;
     registrationDeadline: number; // hours before poll starts
   };
-  
+
   // Notification Settings
   notifications: {
     sendRegistrationConfirmation: boolean;
@@ -190,7 +209,7 @@ export interface SystemSettings {
     sendPollReminders: boolean;
     sendResultsAnnouncement: boolean;
   };
-  
+
   // Security Settings
   security: {
     requireStrongPasswords: boolean;
@@ -200,7 +219,7 @@ export interface SystemSettings {
     maxLoginAttempts: number;
     ipWhitelist: string[];
   };
-  
+
   // Display Settings
   display: {
     showLiveResults: boolean;

@@ -89,6 +89,23 @@ const adminApiFetch = async (endpoint: string, options: RequestInit = {}) => {
   });
 };
 
+// Normalize location fields from camelCase to snake_case for backend
+const mapLocationToSnake = (data: any) => {
+  const payload: any = { ...data };
+
+  if ('countyId' in data) payload.county_id = data.countyId;
+  if ('countyName' in data) payload.county_name = data.countyName;
+  if ('subCountyId' in data) payload.sub_county_id = data.subCountyId;
+  if ('subCountyName' in data) payload.sub_county_name = data.subCountyName;
+  if ('wardId' in data) payload.ward_id = data.wardId;
+  if ('wardName' in data) payload.ward_name = data.wardName;
+  if ('pollingStation' in data) payload.polling_station = data.pollingStation;
+
+  // keep camelCase keys as well so backend middleware that expects camelCase still receives them
+
+  return payload;
+};
+
 // Admin-specific API service
 export const adminAPI = {
   // Auth endpoints
@@ -201,9 +218,17 @@ export const adminAPI = {
   },
 
   updateUser: async (userId: number, userData: Partial<User>): Promise<User> => {
+    // Normalize location fields to snake_case for backend
+    const payload = mapLocationToSnake(userData || {});
+
+    // Also map some common camelCase fields if present
+    if ((userData as any).nationalId) payload.national_id = (userData as any).nationalId;
+    if ((userData as any).isEmailVerified !== undefined) payload.is_email_verified = (userData as any).isEmailVerified;
+    if ((userData as any).isPhoneVerified !== undefined) payload.is_phone_verified = (userData as any).isPhoneVerified;
+
     return adminApiFetch(`/admin/users/${userId}`, {
       method: 'PUT',
-      body: JSON.stringify(userData),
+      body: JSON.stringify(payload),
     });
   },
 
@@ -329,9 +354,25 @@ export const adminAPI = {
 export const api = {
   // Auth endpoints
   register: async (userData: RegisterData) => {
+    // Send registration payload using camelCase keys expected by backend validation
+    const payload: any = {
+      nationalId: userData.nationalId,
+      email: userData.email,
+      phone: userData.phone,
+      password: userData.password,
+      confirmPassword: userData.confirmPassword,
+      countyId: userData.countyId,
+      countyName: userData.countyName,
+      subCountyId: userData.subCountyId,
+      subCountyName: userData.subCountyName,
+      wardId: userData.wardId,
+      wardName: userData.wardName,
+      pollingStation: userData.pollingStation
+    };
+
     return apiFetch('/auth/register', {
       method: 'POST',
-      body: JSON.stringify(userData),
+      body: JSON.stringify(payload),
     });
   },
 
@@ -465,6 +506,28 @@ export const api = {
 
   updateSettings: async (settings: any): Promise<{ message: string }> => {
     return adminAPI.updateSettings(settings);
+  },
+};
+
+// Resources API
+export const resourcesAPI = {
+  getCounties: async (): Promise<Array<{ id: number; name: string; code?: string }>> => {
+    return apiFetch('/resources/counties');
+  },
+  getSubCounties: async (countyId?: number): Promise<Array<{ id: number; countyId: number; name: string; code?: string }>> => {
+    const qp = countyId ? `?countyId=${countyId}` : '';
+    return apiFetch(`/resources/sub-counties${qp}`);
+  },
+  getWards: async (subCountyId?: number): Promise<Array<{ id: number; subCountyId: number; name: string; code?: string }>> => {
+    const qp = subCountyId ? `?subCountyId=${subCountyId}` : '';
+    return apiFetch(`/resources/wards${qp}`);
+  },
+  getPollingStations: async (wardId?: number): Promise<Array<{ id: number; wardId: number; name: string; code?: string }>> => {
+    const qp = wardId ? `?wardId=${wardId}` : '';
+    return apiFetch(`/resources/polling-stations${qp}`);
+  },
+  getCountryTree: async (): Promise<Array<{ id: number; name: string; subCounties: any[] }>> => {
+    return apiFetch('/resources/country-tree');
   },
 };
 
