@@ -101,14 +101,7 @@ const mapLocationToSnake = (data: any) => {
   if ('wardName' in data) payload.ward_name = data.wardName;
   if ('pollingStation' in data) payload.polling_station = data.pollingStation;
 
-  // remove camelCase keys to avoid duplication
-  delete payload.countyId;
-  delete payload.countyName;
-  delete payload.subCountyId;
-  delete payload.subCountyName;
-  delete payload.wardId;
-  delete payload.wardName;
-  delete payload.pollingStation;
+  // keep camelCase keys as well so backend middleware that expects camelCase still receives them
 
   return payload;
 };
@@ -361,17 +354,21 @@ export const adminAPI = {
 export const api = {
   // Auth endpoints
   register: async (userData: RegisterData) => {
-    // Map frontend RegisterData to backend expected snake_case fields
+    // Send registration payload using camelCase keys expected by backend validation
     const payload: any = {
-      national_id: userData.nationalId,
+      nationalId: userData.nationalId,
       email: userData.email,
       phone: userData.phone,
       password: userData.password,
-      // confirmPassword is client-only; don't send it
+      confirmPassword: userData.confirmPassword,
+      countyId: userData.countyId,
+      countyName: userData.countyName,
+      subCountyId: userData.subCountyId,
+      subCountyName: userData.subCountyName,
+      wardId: userData.wardId,
+      wardName: userData.wardName,
+      pollingStation: userData.pollingStation
     };
-
-    // attach location fields
-    Object.assign(payload, mapLocationToSnake(userData));
 
     return apiFetch('/auth/register', {
       method: 'POST',

@@ -1,15 +1,20 @@
 // src/components/admin/EditUserModal.tsx
 import React, { useState } from 'react';
 import '../../styles/createPollModal.css';
+import LocationSelector from '../client/LocationSelector';
 
 interface User {
   id: number;
   email: string;
   nationalId: string;
   phone?: string;
-  county: string;
-  division: string;
-  pollingStation: string;
+  countyId?: number | null;
+  countyName?: string;
+  subCountyId?: number | null;
+  subCountyName?: string;
+  wardId?: number | null;
+  wardName?: string;
+  pollingStation?: string;
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
   createdAt: string;
@@ -26,9 +31,13 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSave }) 
   const [formData, setFormData] = useState({
     email: user.email,
     phone: user.phone || '',
-    county: user.county,
-    division: user.division,
-    pollingStation: user.pollingStation,
+    countyId: user.countyId ?? null,
+    countyName: user.countyName || '',
+    subCountyId: user.subCountyId ?? null,
+    subCountyName: user.subCountyName || '',
+    wardId: user.wardId ?? null,
+    wardName: user.wardName || '',
+    pollingStation: user.pollingStation || '',
     isEmailVerified: user.isEmailVerified,
     isPhoneVerified: user.isPhoneVerified,
   });
@@ -38,20 +47,28 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSave }) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.email || !formData.county || !formData.division || !formData.pollingStation) {
-      setErrors('Please fill in all required fields');
+    if (!formData.email) {
+      setErrors('Email is required');
       return;
     }
 
     onSave({
       email: formData.email,
       phone: formData.phone || undefined,
-      county: formData.county,
-      division: formData.division,
+      countyId: formData.countyId,
+      countyName: formData.countyName,
+      subCountyId: formData.subCountyId,
+      subCountyName: formData.subCountyName,
+      wardId: formData.wardId,
+      wardName: formData.wardName,
       pollingStation: formData.pollingStation,
       isEmailVerified: formData.isEmailVerified,
       isPhoneVerified: formData.isPhoneVerified,
     });
+  };
+
+  const handleLocationSelect = (locationData: any) => {
+    setFormData(prev => ({ ...prev, ...locationData }));
   };
 
   return (
@@ -120,39 +137,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSave }) 
 
             <div className="form-section">
               <h4 className="form-section-title">Location Details</h4>
-              
-              <div className="form-group">
-                <label htmlFor="county">County *</label>
-                <input
-                  id="county"
-                  type="text"
-                  value={formData.county}
-                  onChange={(e) => setFormData({ ...formData, county: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="division">Division *</label>
-                <input
-                  id="division"
-                  type="text"
-                  value={formData.division}
-                  onChange={(e) => setFormData({ ...formData, division: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="pollingStation">Polling Station *</label>
-                <input
-                  id="pollingStation"
-                  type="text"
-                  value={formData.pollingStation}
-                  onChange={(e) => setFormData({ ...formData, pollingStation: e.target.value })}
-                  required
-                />
-              </div>
+              <LocationSelector onSelect={handleLocationSelect} errors={{}} />
             </div>
 
             <div className="info-note">
