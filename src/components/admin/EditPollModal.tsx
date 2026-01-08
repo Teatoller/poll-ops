@@ -1,5 +1,6 @@
 // src/components/admin/EditPollModal.tsx - FIXED VERSION
 import React, { useState, useEffect } from 'react';
+import LocationSelector from '../client/LocationSelector';
 
 interface Candidate {
   id?: number;
@@ -16,6 +17,14 @@ interface Poll {
   startDate: string;
   endDate: string;
   is_active: boolean;
+  scope?: 'NATIONAL' | 'COUNTY' | 'SUB_COUNTY' | 'WARD' | 'GENERAL';
+  countyId?: number | null;
+  countyName?: string | null;
+  subCountyId?: number | null;
+  subCountyName?: string | null;
+  wardId?: number | null;
+  wardName?: string | null;
+  pollingStation?: string | null;
   candidates: Candidate[];
 }
 
@@ -31,6 +40,14 @@ interface FormData {
   startDate: string;
   endDate: string;
   is_active: boolean;
+  scope: 'NATIONAL' | 'COUNTY' | 'SUB_COUNTY' | 'WARD' | 'GENERAL';
+  countyId: number | null;
+  countyName: string | null;
+  subCountyId: number | null;
+  subCountyName: string | null;
+  wardId: number | null;
+  wardName: string | null;
+  pollingStation: string | null;
   candidates: Array<{
     id?: number;
     name: string;
@@ -47,6 +64,14 @@ const EditPollModal: React.FC<EditPollModalProps> = ({ poll, onClose, onSave }) 
     startDate: '',
     endDate: '',
     is_active: true,
+    scope: 'GENERAL',
+    countyId: null,
+    countyName: null,
+    subCountyId: null,
+    subCountyName: null,
+    wardId: null,
+    wardName: null,
+    pollingStation: null,
     candidates: []
   });
 
@@ -84,6 +109,14 @@ const EditPollModal: React.FC<EditPollModalProps> = ({ poll, onClose, onSave }) 
       startDate: formatDateForInput(poll.startDate),
       endDate: formatDateForInput(poll.endDate),
       is_active: poll.is_active,
+      scope: poll.scope || 'GENERAL',
+      countyId: poll.countyId ?? null,
+      countyName: poll.countyName ?? null,
+      subCountyId: poll.subCountyId ?? null,
+      subCountyName: poll.subCountyName ?? null,
+      wardId: poll.wardId ?? null,
+      wardName: poll.wardName ?? null,
+      pollingStation: poll.pollingStation ?? null,
       candidates: formattedCandidates
     });
   }, [poll]);
@@ -95,12 +128,31 @@ const EditPollModal: React.FC<EditPollModalProps> = ({ poll, onClose, onSave }) 
 
     try {
       // Prepare data for API - filter out empty candidates
+      // Validation for scope/location
+      if (formData.scope === 'COUNTY' && !formData.countyId) {
+        throw new Error('Please select a County for a County-scoped poll');
+      }
+      if (formData.scope === 'SUB_COUNTY' && !formData.subCountyId) {
+        throw new Error('Please select a Sub-County for a Sub-County-scoped poll');
+      }
+      if (formData.scope === 'WARD' && !formData.wardId) {
+        throw new Error('Please select a Ward for a Ward-scoped poll');
+      }
+
       const updatedPoll = {
         officeName: formData.officeName,
         description: formData.description,
         startDate: formData.startDate,
         endDate: formData.endDate,
         is_active: formData.is_active,
+        scope: formData.scope,
+        countyId: formData.countyId,
+        countyName: formData.countyName,
+        subCountyId: formData.subCountyId,
+        subCountyName: formData.subCountyName,
+        wardId: formData.wardId,
+        wardName: formData.wardName,
+        pollingStation: formData.pollingStation,
         candidates: formData.candidates
           .filter(c => c.name.trim() && c.party.trim())
           .map(candidate => ({
@@ -154,6 +206,27 @@ const EditPollModal: React.FC<EditPollModalProps> = ({ poll, onClose, onSave }) 
 
   const updateFormData = (field: keyof Omit<FormData, 'candidates'>, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleLocationSelect = (loc: {
+    countyId: number | null;
+    countyName: string;
+    subCountyId: number | null;
+    subCountyName: string;
+    wardId: number | null;
+    wardName: string;
+    pollingStation: string;
+  }) => {
+    setFormData(prev => ({
+      ...prev,
+      countyId: loc.countyId,
+      countyName: loc.countyName || null,
+      subCountyId: loc.subCountyId,
+      subCountyName: loc.subCountyName || null,
+      wardId: loc.wardId,
+      wardName: loc.wardName || null,
+      pollingStation: loc.pollingStation || null,
+    }));
   };
 
   return (
@@ -214,6 +287,28 @@ const EditPollModal: React.FC<EditPollModalProps> = ({ poll, onClose, onSave }) 
               />
             </div>
           </div>
+
+          <div className="form-group">
+            <label>Scope *</label>
+            <select
+              value={formData.scope}
+              onChange={(e) => updateFormData('scope', e.target.value)}
+              disabled={loading}
+            >
+              <option value="NATIONAL">National (everyone)</option>
+              <option value="COUNTY">County</option>
+              <option value="SUB_COUNTY">Sub-County</option>
+              <option value="WARD">Ward</option>
+              <option value="GENERAL">General (public or selectively restricted)</option>
+            </select>
+          </div>
+
+          {(formData.scope !== 'NATIONAL') && (
+            <div className="form-group">
+              <label>Target Location {formData.scope !== 'GENERAL' ? '*' : '(optional)'}</label>
+              <LocationSelector onSelect={handleLocationSelect} errors={{}} />
+            </div>
+          )}
 
           <div className="form-group checkbox-group">
             <label className="checkbox-label">

@@ -17,6 +17,7 @@ const Dashboard: React.FC = () => {
   });
 
   const { user, logout } = useAuth();
+  console.log("user--->>>", user)
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -106,14 +107,17 @@ const Dashboard: React.FC = () => {
     <div className="dashboard">
       <header className="dashboard-header">
         <div className="header-content">
-          <h1>Polling Dashboard</h1>
+          <div className="header-left">
+            <img src="/siteLogo.jpeg" width="50px" height="50px" alt="Site Logo" className="site-logo" />
+            <h1>Polling Dashboard</h1>
+          </div>
           <div className="user-actions">
-            <button onClick={handleRefresh} className="refresh-button">
+            <button type="button" onClick={handleRefresh} className="refresh-button">
               Refresh
             </button>
             <div className="user-info">
               <span>Welcome, {user?.email}</span>
-              <button onClick={handleLogout} className="logout-button">
+              <button type="button" onClick={handleLogout} className="logout-button">
                 Logout
               </button>
             </div>

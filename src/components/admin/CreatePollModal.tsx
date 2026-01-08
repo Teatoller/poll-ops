@@ -1,5 +1,6 @@
 // src/components/admin/CreatePollModal.tsx
 import React, { useState } from 'react';
+import LocationSelector from '../client/LocationSelector';
 import '../../styles/createPollModal.css';
 
 interface CandidateForm {
@@ -16,6 +17,14 @@ interface CreatePollModalProps {
     description: string;
     startDate: string;
     endDate: string;
+    scope?: 'NATIONAL' | 'COUNTY' | 'SUB_COUNTY' | 'WARD' | 'GENERAL';
+    countyId?: number | null;
+    countyName?: string | null;
+    subCountyId?: number | null;
+    subCountyName?: string | null;
+    wardId?: number | null;
+    wardName?: string | null;
+    pollingStation?: string | null;
     candidates: CandidateForm[];
   }) => Promise<void>;
 }
@@ -26,6 +35,14 @@ const CreatePollModal: React.FC<CreatePollModalProps> = ({ onClose, onSubmit }) 
     description: '',
     startDate: '',
     endDate: '',
+    scope: 'GENERAL' as 'NATIONAL' | 'COUNTY' | 'SUB_COUNTY' | 'WARD' | 'GENERAL',
+    countyId: null as number | null,
+    countyName: '' as string | null,
+    subCountyId: null as number | null,
+    subCountyName: '' as string | null,
+    wardId: null as number | null,
+    wardName: '' as string | null,
+    pollingStation: '' as string | null,
     candidates: [{ name: '', party: '', photoUrl: '', description: '' }]
   });
 
@@ -35,6 +52,19 @@ const CreatePollModal: React.FC<CreatePollModalProps> = ({ onClose, onSubmit }) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+        // Scope validation
+        if (formData.scope === 'COUNTY' && !formData.countyId) {
+          setError('Please select a County for a County-scoped poll');
+          return;
+        }
+        if (formData.scope === 'SUB_COUNTY' && !formData.subCountyId) {
+          setError('Please select a Sub-County for a Sub-County-scoped poll');
+          return;
+        }
+        if (formData.scope === 'WARD' && !formData.wardId) {
+          setError('Please select a Ward for a Ward-scoped poll');
+          return;
+        }
     
     // Validation
     if (!formData.officeName.trim()) {
@@ -81,6 +111,14 @@ const CreatePollModal: React.FC<CreatePollModalProps> = ({ onClose, onSubmit }) 
         description: formData.description.trim(),
         startDate: formData.startDate,
         endDate: formData.endDate,
+        scope: formData.scope,
+        countyId: formData.countyId,
+        countyName: formData.countyName,
+        subCountyId: formData.subCountyId,
+        subCountyName: formData.subCountyName,
+        wardId: formData.wardId,
+        wardName: formData.wardName,
+        pollingStation: formData.pollingStation || null,
         candidates: validCandidates.map(candidate => ({
           name: candidate.name.trim(),
           party: candidate.party.trim(),
@@ -127,6 +165,26 @@ const CreatePollModal: React.FC<CreatePollModalProps> = ({ onClose, onSubmit }) 
 
   const updateFormData = (field: keyof Omit<typeof formData, 'candidates'>, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+  const handleLocationSelect = (loc: {
+    countyId: number | null;
+    countyName: string;
+    subCountyId: number | null;
+    subCountyName: string;
+    wardId: number | null;
+    wardName: string;
+    pollingStation: string;
+  }) => {
+    setFormData(prev => ({
+      ...prev,
+      countyId: loc.countyId,
+      countyName: loc.countyName || null,
+      subCountyId: loc.subCountyId,
+      subCountyName: loc.subCountyName || null,
+      wardId: loc.wardId,
+      wardName: loc.wardName || null,
+      pollingStation: loc.pollingStation || null,
+    }));
   };
 
   // Generate default dates (now and 30 days from now)
@@ -255,6 +313,38 @@ const CreatePollModal: React.FC<CreatePollModalProps> = ({ onClose, onSubmit }) 
               </div>
             </div>
           </div>
+
+          <div className="form-group">
+            <label>Scope *</label>
+            <select
+              value={formData.scope}
+              onChange={(e) => setFormData(prev => ({ ...prev, scope: e.target.value as any }))}
+              disabled={loading}
+            >
+              <option value="NATIONAL">National (everyone)</option>
+              <option value="COUNTY">County</option>
+              <option value="SUB_COUNTY">Sub-County</option>
+              <option value="WARD">Ward</option>
+              <option value="GENERAL">General (public or selectively restricted)</option>
+            </select>
+            <div className="input-hint">Choose who should see this poll</div>
+          </div>
+
+          {(formData.scope !== 'NATIONAL') && (
+            <div className="form-group">
+              <label>Target Location {formData.scope !== 'GENERAL' ? '*' : '(optional)'}</label>
+              <LocationSelector
+                onSelect={handleLocationSelect}
+                errors={{}}
+              />
+              <div className="input-hint">
+                {formData.scope === 'COUNTY' && 'Select County'}
+                {formData.scope === 'SUB_COUNTY' && 'Select County and Sub-County'}
+                {formData.scope === 'WARD' && 'Select County, Sub-County and Ward'}
+                {formData.scope === 'GENERAL' && 'Leave empty for public, or select to restrict'}
+              </div>
+            </div>
+          )}
 
           <div className="form-section">
             <div className="section-header">
