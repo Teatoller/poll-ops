@@ -139,6 +139,14 @@ export const adminAPI = {
     description: string;
     startDate: string;
     endDate: string;
+    scope?: 'NATIONAL' | 'COUNTY' | 'SUB_COUNTY' | 'WARD' | 'GENERAL';
+    countyId?: number | null;
+    countyName?: string | null;
+    subCountyId?: number | null;
+    subCountyName?: string | null;
+    wardId?: number | null;
+    wardName?: string | null;
+    pollingStation?: string | null;
     candidates: Omit<Candidate, 'id' | 'poll_id'>[];
   }) => {
     return adminApiFetch('/admin/polls', {
@@ -167,6 +175,14 @@ export const adminAPI = {
     startDate: string;
     endDate: string;
     is_active?: boolean;
+    scope?: 'NATIONAL' | 'COUNTY' | 'SUB_COUNTY' | 'WARD' | 'GENERAL';
+    countyId?: number | null;
+    countyName?: string | null;
+    subCountyId?: number | null;
+    subCountyName?: string | null;
+    wardId?: number | null;
+    wardName?: string | null;
+    pollingStation?: string | null;
     candidates?: Array<{
       id?: number;
       name: string;

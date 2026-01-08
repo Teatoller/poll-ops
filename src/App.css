@@ -994,6 +994,55 @@
   transition: width 0.5s ease;
 }
 
+.location-breakdown {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.location-breakdown h4 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.location-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 8px;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #e9ecef;
+  color: #666;
+  align-items: center;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-row:hover {
+  background: #f8f9fa;
+}
+
 .results-summary {
   background: white;
   padding: 25px;
@@ -1247,11 +1296,15 @@
   }
 
   .location-breakdown {
-    overflow-x: auto;
+    padding: 1.5rem;
   }
 
-  .location-table {
-    min-width: 600px;
+  .table-header,
+  .table-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 10px;
+    font-size: 0.9rem;
   }
 
   .summary-stats {
@@ -1527,12 +1580,59 @@
     font-size: 1rem;
   }
 
+  .location-breakdown {
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
   .location-breakdown h4 {
     font-size: 1rem;
+    margin-bottom: 10px;
   }
 
   .location-table {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+  }
+
+  .table-header {
+    display: none;
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    padding: 10px;
+  }
+
+  .table-row div::before {
+    font-weight: 600;
+    color: #333;
+    display: block;
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+  }
+
+  .table-row div:nth-child(1)::before {
+    content: "County: ";
+  }
+
+  .table-row div:nth-child(2)::before {
+    content: "Sub-County: ";
+  }
+
+  .table-row div:nth-child(3)::before {
+    content: "Ward: ";
+  }
+
+  .table-row div:nth-child(4)::before {
+    content: "Polling Station: ";
+  }
+
+  .table-row div:nth-child(5)::before {
+    content: "Votes: ";
   }
 
   .results-summary {
