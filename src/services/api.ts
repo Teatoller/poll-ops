@@ -89,6 +89,30 @@ const adminApiFetch = async (endpoint: string, options: RequestInit = {}) => {
   });
 };
 
+// Normalize location fields from camelCase to snake_case for backend
+const mapLocationToSnake = (data: any) => {
+  const payload: any = { ...data };
+
+  if ('countyId' in data) payload.county_id = data.countyId;
+  if ('countyName' in data) payload.county_name = data.countyName;
+  if ('subCountyId' in data) payload.sub_county_id = data.subCountyId;
+  if ('subCountyName' in data) payload.sub_county_name = data.subCountyName;
+  if ('wardId' in data) payload.ward_id = data.wardId;
+  if ('wardName' in data) payload.ward_name = data.wardName;
+  if ('pollingStation' in data) payload.polling_station = data.pollingStation;
+
+  // remove camelCase keys to avoid duplication
+  delete payload.countyId;
+  delete payload.countyName;
+  delete payload.subCountyId;
+  delete payload.subCountyName;
+  delete payload.wardId;
+  delete payload.wardName;
+  delete payload.pollingStation;
+
+  return payload;
+};
+
 // Admin-specific API service
 export const adminAPI = {
   // Auth endpoints
@@ -201,9 +225,17 @@ export const adminAPI = {
   },
 
   updateUser: async (userId: number, userData: Partial<User>): Promise<User> => {
+    // Normalize location fields to snake_case for backend
+    const payload = mapLocationToSnake(userData || {});
+
+    // Also map some common camelCase fields if present
+    if ((userData as any).nationalId) payload.national_id = (userData as any).nationalId;
+    if ((userData as any).isEmailVerified !== undefined) payload.is_email_verified = (userData as any).isEmailVerified;
+    if ((userData as any).isPhoneVerified !== undefined) payload.is_phone_verified = (userData as any).isPhoneVerified;
+
     return adminApiFetch(`/admin/users/${userId}`, {
       method: 'PUT',
-      body: JSON.stringify(userData),
+      body: JSON.stringify(payload),
     });
   },
 
@@ -329,9 +361,21 @@ export const adminAPI = {
 export const api = {
   // Auth endpoints
   register: async (userData: RegisterData) => {
+    // Map frontend RegisterData to backend expected snake_case fields
+    const payload: any = {
+      national_id: userData.nationalId,
+      email: userData.email,
+      phone: userData.phone,
+      password: userData.password,
+      // confirmPassword is client-only; don't send it
+    };
+
+    // attach location fields
+    Object.assign(payload, mapLocationToSnake(userData));
+
     return apiFetch('/auth/register', {
       method: 'POST',
-      body: JSON.stringify(userData),
+      body: JSON.stringify(payload),
     });
   },
 
