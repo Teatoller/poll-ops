@@ -140,7 +140,7 @@ const SurveyVoting: React.FC = () => {
           <div className="kenya-flag-banner">
             <img src="/kenyaFlag.jpeg" alt="Kenya Flag" className="flag-image" />
           </div>
-          <h2 className="survey-question">{survey.question}</h2>
+          <h2 className="survey-question" style={{color: "#fff"}}>{survey.question}</h2>
           {survey.description && (
             <p className="survey-description">{survey.description}</p>
           )}

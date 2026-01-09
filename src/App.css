@@ -377,6 +377,7 @@
   padding: 30px;
   display: grid;
   grid-template-columns: 320px 1fr;
+  grid-template-rows: auto 1fr;
   gap: 25px;
   min-height: calc(100vh - 90px);
 }
@@ -384,6 +385,7 @@
 /* Sidebar with profile and stats */
 .user-profile-card {
   grid-column: 1;
+  grid-row: 1 / span 2;
   background: white;
   padding: 25px;
   border-radius: 12px;
@@ -405,7 +407,7 @@
 /* Main content area */
 .polls-section {
   grid-column: 2;
-  margin-bottom: 30px;
+  grid-row: 1 / span 2;
 }
 
 .section-header {
