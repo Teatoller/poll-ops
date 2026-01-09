@@ -53,6 +53,73 @@ export interface Vote {
   createdAt: string;
 }
 
+// Survey/Opinion Poll Types
+export interface SurveyPoll {
+  id: number;
+  question: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  is_active: boolean;
+  scope: 'NATIONAL' | 'COUNTY' | 'SUB_COUNTY' | 'WARD' | 'GENERAL';
+  countyId?: number | null;
+  countyName?: string | null;
+  subCountyId?: number | null;
+  subCountyName?: string | null;
+  wardId?: number | null;
+  wardName?: string | null;
+  pollingStation?: string | null;
+  options: SurveyOption[];
+  totalVotes?: number;
+  pollType: 'SURVEY';
+}
+
+export interface SurveyOption {
+  id: number;
+  optionText: string;
+  voteCount?: number;
+  percentage?: number;
+}
+
+export interface SurveyVote {
+  id: number;
+  userId: number;
+  surveyId: number;
+  optionId: number;
+  createdAt: string;
+}
+
+export interface SurveyResults {
+  survey: {
+    id: number;
+    question: string;
+    description: string;
+    startDate: string;
+    endDate: string;
+    is_active: boolean;
+    totalVotes: number;
+    scope: string;
+  };
+  options: Array<{
+    id: number;
+    optionText: string;
+    voteCount: number;
+    percentage: number;
+  }>;
+  locationBreakdown?: Array<{
+    county_name: string;
+    sub_county_name: string;
+    ward_name: string;
+    polling_station: string;
+    votes_per_station: number;
+  }>;
+  summary: {
+    totalVotes: number;
+    totalOptions: number;
+    votingStations: number;
+  };
+}
+
 export interface AuthContextType {
   user: User | null;
   admin: Admin | null; // Add admin field
