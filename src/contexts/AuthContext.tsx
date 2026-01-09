@@ -87,10 +87,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response = await api.register(userData);
 
-      // Store token and user data
-      localStorage.setItem('authToken', response.token);
-      localStorage.setItem('userData', JSON.stringify(response.user));
-      setUser(response.user);
+      // Don't auto-login - user must verify email first
+      // The backend sends verification email, user must click link before logging in
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : 'Registration failed');
     }
