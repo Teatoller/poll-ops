@@ -104,13 +104,15 @@ const SurveyResults: React.FC = () => {
       </div>
     );
   }
-
+  
   const { survey, options, totalVotes } = surveyResults;
 
   return (
     <div className="survey-results">
       <div className="survey-results-header">
-        <div className="kenya-flag-banner">
+        <div 
+        className="kenya-flag-banner"
+        >
           <img src="/kenyaFlag.jpeg" alt="Kenya Flag" className="flag-banner" />
           <div className="flag-overlay"></div>
         </div>
