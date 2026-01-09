@@ -4,8 +4,11 @@ import type { LocationData } from '../../types';
 import { resourcesAPI } from '../../services/api';
 
 interface LocationSelectorProps {
-  onSelect: (locationData: LocationData) => void;
-  errors: { [key: string]: string };
+  onSelect?: (locationData: LocationData) => void;
+  onLocationSelect?: (locationData: LocationData) => void;
+  errors?: { [key: string]: string };
+  disabled?: boolean;
+  required?: boolean;
 }
 
 interface Division {
@@ -77,7 +80,7 @@ interface County {
 }
 
 
-const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, errors }) => {
+const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, onLocationSelect, errors = {}, disabled }) => {
   // const [selectedCounty, setSelectedCounty] = useState<string>('');
   // const [selectedDivision, setSelectedDivision] = useState<string>('');
   // const [selectedPollingStation, setSelectedPollingStation] = useState<string>('');
@@ -129,7 +132,10 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, errors })
   // }, [selectedCounty, selectedDivision, selectedPollingStation, onSelect]);
 
   useEffect(() => {
-    onSelect({
+    const handler = onLocationSelect || onSelect;
+    if (!handler) return;
+
+    handler({
       countyId: county?.id ?? null,
       countyName: county?.name ?? '',
       subCountyId: subCounty?.id ?? null,
@@ -138,7 +144,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, errors })
       wardName: ward?.name ?? '',
       pollingStation
     });
-  }, [county, subCounty, ward, pollingStation, onSelect]);
+  }, [county, subCounty, ward, pollingStation, onSelect, onLocationSelect]);
 
   return (
     <div className="location-selector">
@@ -214,6 +220,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, errors })
             setWard(null);
             setPollingStation('');
           }}
+          disabled={disabled}
         >
           <option value="">Select County</option>
           {tree.map(c => (
@@ -226,7 +233,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, errors })
         <label>Sub County *</label>
         <select
           value={subCounty?.id ?? ''}
-          disabled={!county}
+          disabled={!county || disabled}
           onChange={(e) => {
             const selected = county?.subCounties.find(sc => sc.id === Number(e.target.value)) || null;
             setSubCounty(selected);
@@ -245,7 +252,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, errors })
         <label>Ward *</label>
         <select
           value={ward?.id ?? ''}
-          disabled={!subCounty}
+          disabled={!subCounty || disabled}
           onChange={(e) => {
             const selected = subCounty?.wards.find(w => w.id === Number(e.target.value)) || null;
             setWard(selected);
@@ -263,7 +270,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, errors })
         <label>Polling Station *</label>
         <select
           value={pollingStation}
-          disabled={!ward}
+          disabled={!ward || disabled}
           onChange={(e) => setPollingStation(e.target.value)}
         >
           <option value="">Select Polling Station</option>
