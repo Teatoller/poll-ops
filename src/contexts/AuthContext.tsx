@@ -1,5 +1,5 @@
 // src/contexts/AuthContext.tsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { User, AuthContextType, RegisterData } from '../types';
 import { api } from '../services/api';
@@ -43,19 +43,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(false);
     }
   }, []);
-
-  // const validateToken = async (token: string): Promise<void> => {
-  //   try {
-  //     // Try to fetch active polls to validate token
-  //     await api.getActivePolls();
-  //     // If successful, token is valid
-  //   } catch (error) {
-  //     console.error('Token validation failed:', error);
-  //     clearAuthData();
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const validateToken = async (token: string): Promise<void> => {
     try {
@@ -128,16 +115,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     clearAuthData();
   };
 
-  const value: AuthContextType = {
-    user,
-    register,
-    login,
-    logout,
-    loading,
-    admin: null,
-    adminLogin,
-    adminLogout
-  };
+  const value: AuthContextType = useMemo(
+    () => ({
+      user,
+      register,
+      login,
+      logout,
+      loading,
+      admin: null,
+      adminLogin,
+      adminLogout
+    }),
+    [user, loading]
+  );
 
   return (
     <AuthContext.Provider value={value}>
