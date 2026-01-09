@@ -1,8 +1,7 @@
-// src/components/admin/PollManagement.tsx - UPDATED
+// src/components/admin/PollManagement.tsx
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 import type { SurveyPoll } from '../../types';
-// import CreatePollModal from './CreatePollModal'; // Make sure this exists
 import EditPollModal from './EditPollModal';
 import CreatePollModal from './CreatePollModal';
 import CreateSurveyPollModal from './CreateSurveyPollModal';
@@ -106,10 +105,10 @@ const PollManagement: React.FC = () => {
     }
   };
 
-  const handleToggleSurveyActive = async (surveyId: number, isActive: boolean) => {
+  const handleToggleSurveyActive = async (surveyId: number) => {
     try {
       setError('');
-      await api.toggleSurveyActive(surveyId, !isActive);
+      await api.toggleSurveyActive(surveyId);
       fetchSurveys();
     } catch (error: any) {
       setError(error.message || 'Failed to toggle survey status');
@@ -133,7 +132,7 @@ const PollManagement: React.FC = () => {
   const handleToggleActive = async (pollId: number, isActive: boolean) => {
     try {
       setError('');
-      await api.togglePollActive(pollId, !isActive);
+      await api.togglePollActive(pollId, isActive);
       fetchPolls();
     } catch (error: any) {
       setError(error.message || 'Failed to toggle poll status');
@@ -186,6 +185,168 @@ const PollManagement: React.FC = () => {
     }
   };
   
+  const pollsContent = (
+    <div className="polls-table-container">
+      <table className="polls-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Office Name</th>
+            <th>Description</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Candidates</th>
+            <th>Votes</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {polls.map(poll => (
+            <tr key={poll.id}>
+              <td>#{poll.id}</td>
+              <td>{poll.officeName}</td>
+              <td className="description-cell">
+                {poll.description.length > 50 
+                  ? `${poll.description.substring(0, 50)}...` 
+                  : poll.description}
+              </td>
+              <td>{new Date(poll.startDate).toLocaleDateString()}</td>
+              <td>{new Date(poll.endDate).toLocaleDateString()}</td>
+              <td>{poll.candidateCount || poll.candidates?.length || 0}</td>
+              <td>{(poll.totalVotes || 0).toLocaleString()}</td>
+              <td>
+                <span className={`status-badge ${poll.is_active ? 'status-active' : 'status-inactive'}`}>
+                  {poll.is_active ? 'Active' : 'Inactive'}
+                </span>
+              </td>
+              <td>
+                <div className="action-buttons">
+                  <button 
+                    onClick={() => handleEditPoll(poll)}
+                    className="btn-action btn-edit"
+                    title="Edit poll"
+                    type="button"
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    onClick={() => handleToggleActive(poll.id, poll.is_active)}
+                    className={`btn-action ${poll.is_active ? 'btn-deactivate' : 'btn-activate'}`}
+                    title={poll.is_active ? 'Deactivate poll' : 'Activate poll'}
+                    type="button"
+                  >
+                    {poll.is_active ? 'Deactivate' : 'Activate'}
+                  </button>
+                  <button 
+                    onClick={() => handleDeletePoll(poll.id)}
+                    className="btn-action btn-delete"
+                    title="Delete poll"
+                    disabled={(poll.totalVotes || 0) > 0}
+                    type="button"
+                  >
+                    Delete
+                  </button>
+                </div>
+                {(poll.totalVotes || 0) > 0 && (
+                  <div className="delete-hint">
+                    Cannot delete poll with votes
+                  </div>
+                )}
+              </td>
+            </tr>
+          ))}
+          {polls.length === 0 && (
+            <tr>
+              <td colSpan={9} className="no-data">
+                No polls found. Create your first poll!
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const surveysContent = (
+    <div className="polls-table-container">
+      <table className="polls-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Question</th>
+            <th>Description</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Options</th>
+            <th>Votes</th>
+            <th>Scope</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {surveys.map(survey => (
+            <tr key={survey.id}>
+              <td>#{survey.id}</td>
+              <td>{survey.question}</td>
+              <td className="description-cell">
+                {survey.description && survey.description.length > 50 
+                  ? `${survey.description.substring(0, 50)}...` 
+                  : survey.description || '-'}
+              </td>
+              <td>{new Date(survey.startDate).toLocaleDateString()}</td>
+              <td>{new Date(survey.endDate).toLocaleDateString()}</td>
+              <td>{survey.options?.length || 0}</td>
+              <td>{(survey.totalVotes || 0).toLocaleString()}</td>
+              <td>
+                <span className="scope-badge">{survey.scope}</span>
+              </td>
+              <td>
+                <span className={`status-badge ${survey.is_active ? 'status-active' : 'status-inactive'}`}>
+                  {survey.is_active ? 'Active' : 'Inactive'}
+                </span>
+              </td>
+              <td>
+                <div className="action-buttons">
+                  <button 
+                    onClick={() => handleToggleSurveyActive(survey.id)}
+                    className={`btn-action ${survey.is_active ? 'btn-deactivate' : 'btn-activate'}`}
+                    title={survey.is_active ? 'Deactivate survey' : 'Activate survey'}
+                    type="button"
+                  >
+                    {survey.is_active ? 'Deactivate' : 'Activate'}
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteSurvey(survey.id)}
+                    className="btn-action btn-delete"
+                    title="Delete survey"
+                    disabled={(survey.totalVotes || 0) > 0}
+                    type="button"
+                  >
+                    Delete
+                  </button>
+                </div>
+                {(survey.totalVotes || 0) > 0 && (
+                  <div className="delete-hint">
+                    Cannot delete survey with votes
+                  </div>
+                )}
+              </td>
+            </tr>
+          ))}
+          {surveys.length === 0 && (
+            <tr>
+              <td colSpan={10} className="no-data">
+                No surveys found. Create your first survey!
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
   return (
     <div className="poll-management">
       <div className="page-header">
@@ -194,12 +355,14 @@ const PollManagement: React.FC = () => {
           <button 
             onClick={() => setShowCreateModal(true)}
             className="btn-primary"
+            type="button"
           >
             + Create Election Poll
           </button>
           <button 
             onClick={() => setShowCreateSurveyModal(true)}
             className="btn-primary btn-survey"
+            type="button"
           >
             + Create Survey Poll
           </button>
@@ -217,12 +380,14 @@ const PollManagement: React.FC = () => {
         <button 
           className={`tab ${activeTab === 'polls' ? 'active' : ''}`}
           onClick={() => setActiveTab('polls')}
+          type="button"
         >
           Election Polls ({polls.length})
         </button>
         <button 
           className={`tab ${activeTab === 'surveys' ? 'active' : ''}`}
           onClick={() => setActiveTab('surveys')}
+          type="button"
         >
           Survey Polls ({surveys.length})
         </button>
@@ -233,7 +398,7 @@ const PollManagement: React.FC = () => {
           <div className="spinner"></div>
           <p>Loading {activeTab === 'polls' ? 'polls' : 'surveys'}...</p>
         </div>
-      ) : activeTab === 'polls' ? (
+      ) : activeTab === 'polls' ? pollsContent : surveysContent}
 
       <div className="polls-table-container">
         <table className="polls-table">
@@ -313,82 +478,6 @@ const PollManagement: React.FC = () => {
           </tbody>
         </table>
       </div>
-      ) : (
-        <div className="polls-table-container">
-          <table className="polls-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Question</th>
-                <th>Description</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Options</th>
-                <th>Votes</th>
-                <th>Scope</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {surveys.map(survey => (
-                <tr key={survey.id}>
-                  <td>#{survey.id}</td>
-                  <td>{survey.question}</td>
-                  <td className="description-cell">
-                    {survey.description && survey.description.length > 50 
-                      ? `${survey.description.substring(0, 50)}...` 
-                      : survey.description || '-'}
-                  </td>
-                  <td>{new Date(survey.startDate).toLocaleDateString()}</td>
-                  <td>{new Date(survey.endDate).toLocaleDateString()}</td>
-                  <td>{survey.options?.length || 0}</td>
-                  <td>{(survey.totalVotes || 0).toLocaleString()}</td>
-                  <td>
-                    <span className="scope-badge">{survey.scope}</span>
-                  </td>
-                  <td>
-                    <span className={`status-badge ${survey.is_active ? 'status-active' : 'status-inactive'}`}>
-                      {survey.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      <button 
-                        onClick={() => handleToggleSurveyActive(survey.id, survey.is_active)}
-                        className={`btn-action ${survey.is_active ? 'btn-deactivate' : 'btn-activate'}`}
-                        title={survey.is_active ? 'Deactivate survey' : 'Activate survey'}
-                      >
-                        {survey.is_active ? 'Deactivate' : 'Activate'}
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteSurvey(survey.id)}
-                        className="btn-action btn-delete"
-                        title="Delete survey"
-                        disabled={(survey.totalVotes || 0) > 0}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                    {(survey.totalVotes || 0) > 0 && (
-                      <div className="delete-hint">
-                        Cannot delete survey with votes
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-              {surveys.length === 0 && (
-                <tr>
-                  <td colSpan={10} className="no-data">
-                    No surveys found. Create your first survey!
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
 
       {showCreateModal && (
         <CreatePollModal
