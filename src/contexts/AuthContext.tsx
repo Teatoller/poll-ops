@@ -1,5 +1,5 @@
 // src/contexts/AuthContext.tsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { User, AuthContextType, RegisterData } from '../types';
 import { api } from '../services/api';
@@ -44,19 +44,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  // const validateToken = async (token: string): Promise<void> => {
-  //   try {
-  //     // Try to fetch active polls to validate token
-  //     await api.getActivePolls();
-  //     // If successful, token is valid
-  //   } catch (error) {
-  //     console.error('Token validation failed:', error);
-  //     clearAuthData();
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const validateToken = async (token: string): Promise<void> => {
     try {
       // Actually use the token - for example, set it as Authorization header
@@ -87,10 +74,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response = await api.register(userData);
 
-      // Store token and user data
-      localStorage.setItem('authToken', response.token);
-      localStorage.setItem('userData', JSON.stringify(response.user));
-      setUser(response.user);
+      // Don't auto-login - user must verify email first
+      // The backend sends verification email, user must click link before logging in
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : 'Registration failed');
     }
@@ -130,16 +115,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     clearAuthData();
   };
 
-  const value: AuthContextType = {
-    user,
-    register,
-    login,
-    logout,
-    loading,
-    admin: null,
-    adminLogin,
-    adminLogout
-  };
+  const value: AuthContextType = useMemo(
+    () => ({
+      user,
+      register,
+      login,
+      logout,
+      loading,
+      admin: null,
+      adminLogin,
+      adminLogout
+    }),
+    [user, loading]
+  );
 
   return (
     <AuthContext.Provider value={value}>

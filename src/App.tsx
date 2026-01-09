@@ -2,12 +2,12 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css'
-import Dashboard from './components/Dashboard';
-import Register from './components/Register';
-import PollingStation from './components/PollingStation';
+// import Dashboard from './components/Dashboard';
+import Register from './components/client/Register';
+import PollingStation from './components/client/PollingStation';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Login from './components/Login';
-import Results from './components/Results';
+import Login from './components/client/Login';
+import Results from './components/client/Results';
 import AdminDashboard from './components/admin/AdminDashboard';
 import PollManagement from './components/admin/PollManagement';
 import UserManagement from './components/admin/UserManagement';
@@ -18,7 +18,10 @@ import AdminLogin from './components/admin/AdminLogin';
 import { AdminProvider } from './contexts/AdminContext';
 import AdminSettings from './components/admin/AdminSettings';
 import AdminProtectedRoute from './components/admin/ProtectedRoute';
-import VerifyEmail from './components/VerifyEmail';
+import VerifyEmail from './components/client/VerifyEmail';
+import Dashboard from './components/client/Dashboard';
+import SurveyVoting from './components/client/SurveyVoting';
+import SurveyResults from './components/client/SurveyResults';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -66,6 +69,22 @@ const App: React.FC = () => {
                 element={
                   <ProtectedRoute>
                     <Results />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/survey-voting"
+                element={
+                  <ProtectedRoute>
+                    <SurveyVoting />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/survey-results"
+                element={
+                  <ProtectedRoute>
+                    <SurveyResults />
                   </ProtectedRoute>
                 }
               />

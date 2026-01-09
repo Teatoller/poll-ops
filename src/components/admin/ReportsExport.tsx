@@ -199,9 +199,9 @@ const ReportsExport = () => {
 
   const downloadTemplate = (type: string) => {
     const templates: Record<string, string> = {
-      users: `email,first_name,last_name,national_id,county,is_email_verified,created_at`,
-      votes: `user_id,poll_id,candidate_id,county,created_at`,
-      polls: `office_name,description,start_date,end_date,is_active,created_at`
+      users: `email,firstName,lastName,nationalId,countyId,countyName,subCountyId,subCountyName,wardId,wardName,pollingStation,isEmailVerified,createdAt`,
+      votes: `userId,pollId,candidateId,countyName,createdAt`,
+      polls: `officeName,description,startDate,endDate,isActive,createdAt`
     };
     
     const template = templates[type] || '';

@@ -1,9 +1,11 @@
 // src/components/admin/PollManagement.tsx - UPDATED
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import type { SurveyPoll } from '../../types';
 // import CreatePollModal from './CreatePollModal'; // Make sure this exists
 import EditPollModal from './EditPollModal';
 import CreatePollModal from './CreatePollModal';
+import CreateSurveyPollModal from './CreateSurveyPollModal';
 import '../../styles/pollManagement.css';
 
 interface Poll {
@@ -25,18 +27,26 @@ interface Poll {
 }
 
 const PollManagement: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'polls' | 'surveys'>('polls');
   const [polls, setPolls] = useState<Poll[]>([]);
+  const [surveys, setSurveys] = useState<SurveyPoll[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCreateSurveyModal, setShowCreateSurveyModal] = useState(false);
   const [editingPoll, setEditingPoll] = useState<Poll | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchPolls();
-  }, []);
+    if (activeTab === 'polls') {
+      fetchPolls();
+    } else {
+      fetchSurveys();
+    }
+  }, [activeTab]);
 
   const fetchPolls = async () => {
     try {
+      setLoading(true);
       setError('');
       const data = await api.getAdminPolls();
       // Transform data if needed
@@ -57,6 +67,20 @@ const PollManagement: React.FC = () => {
     }
   };
 
+  const fetchSurveys = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const data = await api.getAdminSurveys();
+      setSurveys(data);
+    } catch (error: any) {
+      setError(error.message || 'Failed to fetch surveys');
+      console.error('Error fetching surveys:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCreatePoll = async (pollData: any) => {
     try {
       setError('');
@@ -66,6 +90,43 @@ const PollManagement: React.FC = () => {
     } catch (error: any) {
       setError(error.message || 'Failed to create poll');
       console.error('Error creating poll:', error);
+    }
+  };
+
+  const handleCreateSurvey = async (surveyData: any) => {
+    try {
+      setError('');
+      await api.createSurvey(surveyData);
+      alert('Survey created successfully!');
+      setShowCreateSurveyModal(false);
+      fetchSurveys();
+    } catch (error: any) {
+      setError(error.message || 'Failed to create survey');
+      console.error('Error creating survey:', error);
+    }
+  };
+
+  const handleToggleSurveyActive = async (surveyId: number, isActive: boolean) => {
+    try {
+      setError('');
+      await api.toggleSurveyActive(surveyId, !isActive);
+      fetchSurveys();
+    } catch (error: any) {
+      setError(error.message || 'Failed to toggle survey status');
+      console.error('Error toggling survey:', error);
+    }
+  };
+
+  const handleDeleteSurvey = async (surveyId: number) => {
+    if (window.confirm('Are you sure you want to delete this survey? This action cannot be undone.')) {
+      try {
+        setError('');
+        await api.deleteSurvey(surveyId);
+        fetchSurveys();
+      } catch (error: any) {
+        setError(error.message || 'Failed to delete survey');
+        console.error('Error deleting survey:', error);
+      }
     }
   };
 
@@ -125,23 +186,24 @@ const PollManagement: React.FC = () => {
     }
   };
   
-  if (loading) return (
-    <div className="loading-container">
-      <div className="spinner"></div>
-      <p>Loading polls...</p>
-    </div>
-  );
-
   return (
     <div className="poll-management">
       <div className="page-header">
-        <h2>Poll Management</h2>
-        <button 
-          onClick={() => setShowCreateModal(true)}
-          className="btn-primary"
-        >
-          + Create New Poll
-        </button>
+        <h2>Poll & Survey Management</h2>
+        <div className="header-actions">
+          <button 
+            onClick={() => setShowCreateModal(true)}
+            className="btn-primary"
+          >
+            + Create Election Poll
+          </button>
+          <button 
+            onClick={() => setShowCreateSurveyModal(true)}
+            className="btn-primary btn-survey"
+          >
+            + Create Survey Poll
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -149,6 +211,29 @@ const PollManagement: React.FC = () => {
           {error}
         </div>
       )}
+
+      {/* Tabs */}
+      <div className="tabs">
+        <button 
+          className={`tab ${activeTab === 'polls' ? 'active' : ''}`}
+          onClick={() => setActiveTab('polls')}
+        >
+          Election Polls ({polls.length})
+        </button>
+        <button 
+          className={`tab ${activeTab === 'surveys' ? 'active' : ''}`}
+          onClick={() => setActiveTab('surveys')}
+        >
+          Survey Polls ({surveys.length})
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Loading {activeTab === 'polls' ? 'polls' : 'surveys'}...</p>
+        </div>
+      ) : activeTab === 'polls' ? (
 
       <div className="polls-table-container">
         <table className="polls-table">
@@ -228,11 +313,94 @@ const PollManagement: React.FC = () => {
           </tbody>
         </table>
       </div>
+      ) : (
+        <div className="polls-table-container">
+          <table className="polls-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Question</th>
+                <th>Description</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Options</th>
+                <th>Votes</th>
+                <th>Scope</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {surveys.map(survey => (
+                <tr key={survey.id}>
+                  <td>#{survey.id}</td>
+                  <td>{survey.question}</td>
+                  <td className="description-cell">
+                    {survey.description && survey.description.length > 50 
+                      ? `${survey.description.substring(0, 50)}...` 
+                      : survey.description || '-'}
+                  </td>
+                  <td>{new Date(survey.startDate).toLocaleDateString()}</td>
+                  <td>{new Date(survey.endDate).toLocaleDateString()}</td>
+                  <td>{survey.options?.length || 0}</td>
+                  <td>{(survey.totalVotes || 0).toLocaleString()}</td>
+                  <td>
+                    <span className="scope-badge">{survey.scope}</span>
+                  </td>
+                  <td>
+                    <span className={`status-badge ${survey.is_active ? 'status-active' : 'status-inactive'}`}>
+                      {survey.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="action-buttons">
+                      <button 
+                        onClick={() => handleToggleSurveyActive(survey.id, survey.is_active)}
+                        className={`btn-action ${survey.is_active ? 'btn-deactivate' : 'btn-activate'}`}
+                        title={survey.is_active ? 'Deactivate survey' : 'Activate survey'}
+                      >
+                        {survey.is_active ? 'Deactivate' : 'Activate'}
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteSurvey(survey.id)}
+                        className="btn-action btn-delete"
+                        title="Delete survey"
+                        disabled={(survey.totalVotes || 0) > 0}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                    {(survey.totalVotes || 0) > 0 && (
+                      <div className="delete-hint">
+                        Cannot delete survey with votes
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {surveys.length === 0 && (
+                <tr>
+                  <td colSpan={10} className="no-data">
+                    No surveys found. Create your first survey!
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {showCreateModal && (
         <CreatePollModal
           onClose={() => setShowCreateModal(false)}
           onSubmit={handleCreatePoll}
+        />
+      )}
+
+      {showCreateSurveyModal && (
+        <CreateSurveyPollModal
+          onClose={() => setShowCreateSurveyModal(false)}
+          onSubmit={handleCreateSurvey}
         />
       )}
 

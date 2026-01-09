@@ -7,9 +7,13 @@ interface User {
   email: string;
   nationalId: string;
   phone?: string;
-  county: string;
-  division: string;
-  pollingStation: string;
+  countyId?: number;
+  countyName?: string;
+  subCountyId?: number;
+  subCountyName?: string;
+  wardId?: number;
+  wardName?: string;
+  pollingStation?: string;
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
   createdAt: string;
@@ -71,15 +75,19 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({ user, onClose }) => {
               <h4 className="section-title">Location Details</h4>
               <div className="detail-row">
                 <span className="detail-label">County:</span>
-                <span className="detail-value">{user.county}</span>
+                <span className="detail-value">{user.countyName || 'N/A'}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Division:</span>
-                <span className="detail-value">{user.division}</span>
+                <span className="detail-label">Sub-County:</span>
+                <span className="detail-value">{user.subCountyName || 'N/A'}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Ward:</span>
+                <span className="detail-value">{user.wardName || 'N/A'}</span>
               </div>
               <div className="detail-row">
                 <span className="detail-label">Polling Station:</span>
-                <span className="detail-value">{user.pollingStation}</span>
+                <span className="detail-value">{user.pollingStation || 'N/A'}</span>
               </div>
             </div>
 

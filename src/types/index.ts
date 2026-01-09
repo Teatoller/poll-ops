@@ -53,6 +53,73 @@ export interface Vote {
   createdAt: string;
 }
 
+// Survey/Opinion Poll Types
+export interface SurveyPoll {
+  id: number;
+  question: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  is_active: boolean;
+  scope: 'NATIONAL' | 'COUNTY' | 'SUB_COUNTY' | 'WARD' | 'GENERAL';
+  countyId?: number | null;
+  countyName?: string | null;
+  subCountyId?: number | null;
+  subCountyName?: string | null;
+  wardId?: number | null;
+  wardName?: string | null;
+  pollingStation?: string | null;
+  options: SurveyOption[];
+  totalVotes?: number;
+  pollType: 'SURVEY';
+}
+
+export interface SurveyOption {
+  id: number;
+  optionText: string;
+  voteCount?: number;
+  percentage?: number;
+}
+
+export interface SurveyVote {
+  id: number;
+  userId: number;
+  surveyId: number;
+  optionId: number;
+  createdAt: string;
+}
+
+export interface SurveyResults {
+  survey: {
+    id: number;
+    question: string;
+    description: string;
+    startDate: string;
+    endDate: string;
+    is_active: boolean;
+    totalVotes: number;
+    scope: string;
+  };
+  options: Array<{
+    id: number;
+    optionText: string;
+    voteCount: number;
+    percentage: number;
+  }>;
+  locationBreakdown?: Array<{
+    county_name: string;
+    sub_county_name: string;
+    ward_name: string;
+    polling_station: string;
+    votes_per_station: number;
+  }>;
+  summary: {
+    totalVotes: number;
+    totalOptions: number;
+    votingStations: number;
+  };
+}
+
 export interface AuthContextType {
   user: User | null;
   admin: Admin | null; // Add admin field
@@ -70,16 +137,35 @@ export interface Admin {
   role: string;
 }
 
-export interface RegisterData {
+// export interface RegisterData {
+//   nationalId: string;
+//   email: string;
+//   phone: string;
+//   password: string;
+//   confirmPassword: string;
+//   county: string;
+//   division: string;
+//   pollingStation: string;
+// }
+
+export interface LocationData {
+  countyId: number | null;
+  countyName: string;
+  subCountyId: number | null;
+  subCountyName: string;
+  wardId: number | null;
+  wardName: string;
+  pollingStation: string;
+}
+
+export interface RegisterData extends LocationData {
   nationalId: string;
   email: string;
   phone: string;
   password: string;
   confirmPassword: string;
-  county: string;
-  division: string;
-  pollingStation: string;
 }
+
 
 export interface LoginData {
   email: string;
@@ -92,11 +178,11 @@ export interface ApiResponse<T = any> {
   error?: string;
 }
 
-export interface LocationData {
-  county: string;
-  division: string;
-  pollingStation: string;
-}
+// export interface LocationData {
+//   county: string;
+//   division: string;
+//   pollingStation: string;
+// }
 
 export interface VoteData {
   pollId: number;
@@ -173,7 +259,7 @@ export interface SystemSettings {
     allowVoteEditing: boolean;
     voteEditingDeadline: number; // hours before poll ends
   };
-  
+
   // Registration Settings
   registration: {
     requireEmailVerification: boolean;
@@ -182,7 +268,7 @@ export interface SystemSettings {
     allowMultipleRegistrations: boolean;
     registrationDeadline: number; // hours before poll starts
   };
-  
+
   // Notification Settings
   notifications: {
     sendRegistrationConfirmation: boolean;
@@ -190,7 +276,7 @@ export interface SystemSettings {
     sendPollReminders: boolean;
     sendResultsAnnouncement: boolean;
   };
-  
+
   // Security Settings
   security: {
     requireStrongPasswords: boolean;
@@ -200,7 +286,7 @@ export interface SystemSettings {
     maxLoginAttempts: number;
     ipWhitelist: string[];
   };
-  
+
   // Display Settings
   display: {
     showLiveResults: boolean;

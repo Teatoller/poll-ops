@@ -1,24 +1,39 @@
 // src/components/Register.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import LocationSelector from './LocationSelector';
-import type { LocationData, RegisterData } from '../types';
+import type { LocationData, RegisterData } from '../../types';
 
 const Register: React.FC = () => {
+  // const [formData, setFormData] = useState<RegisterData>({
+  //   nationalId: '',
+  //   email: '',
+  //   phone: '',
+  //   password: '',
+  //   confirmPassword: '',
+  //   county: '',
+  //   division: '',
+  //   pollingStation: ''
+  // });
   const [formData, setFormData] = useState<RegisterData>({
     nationalId: '',
     email: '',
     phone: '',
     password: '',
     confirmPassword: '',
-    county: '',
-    division: '',
+    countyId: null,
+    countyName: '',
+    subCountyId: null,
+    subCountyName: '',
+    wardId: null,
+    wardName: '',
     pollingStation: ''
   });
+
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
-  
+
   const { register, user } = useAuth();
   const navigate = useNavigate();
 
@@ -28,49 +43,63 @@ const Register: React.FC = () => {
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
-    
+
     // National ID validation (example for Kenya)
     if (!/^\d{8}$/.test(formData.nationalId)) {
       newErrors.nationalId = 'Valid National ID required (8 digits)';
     }
-    
+
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Valid email required';
     }
-    
+
     if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
+    // if (!formData.pollingStation) {
+    //   newErrors.pollingStation = 'Polling station selection required';
+    // }
+
     if (!formData.pollingStation) {
       newErrors.pollingStation = 'Polling station selection required';
     }
-    
+
+    if (!formData.wardId) {
+      newErrors.ward = 'Ward selection required';
+    }
+    if (!formData.subCountyId) {
+      newErrors.division = 'Sub county selection required';
+    }
+    if (!formData.countyId) {
+      newErrors.county = 'County selection required';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setLoading(true);
     try {
       await register(formData);
       // Show success message and redirect
-      navigate('/login', { 
-        state: { 
-          message: 'Registration successful! Please check your email to verify your account.' 
-        } 
+      navigate('/login', {
+        state: {
+          message: 'Registration successful! Please check your email to verify your account.'
+        }
       });
     } catch (error) {
-      setErrors({ 
-        submit: error instanceof Error ? error.message : 'Registration failed' 
+      setErrors({
+        submit: error instanceof Error ? error.message : 'Registration failed'
       });
     } finally {
       setLoading(false);
@@ -83,7 +112,7 @@ const Register: React.FC = () => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -104,7 +133,7 @@ const Register: React.FC = () => {
     <div className="register-container">
       <div className="register-form">
         <h2>Voter Registration</h2>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="nationalId">National ID *</label>
@@ -184,8 +213,8 @@ const Register: React.FC = () => {
 
           {errors.submit && <div className="error-message submit-error">{errors.submit}</div>}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
             className="register-button"
           >

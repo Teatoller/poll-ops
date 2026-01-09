@@ -1,9 +1,9 @@
 // src/components/Results.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { api } from '../services/api';
-import type { Poll } from '../types';
+import { useAuth } from '../../contexts/AuthContext';
+import { api } from '../../services/api';
+import type { Poll } from '../../types';
 
 interface PollResults {
   poll: {
@@ -26,8 +26,9 @@ interface PollResults {
     percentage: number;
   }>;
   locationBreakdown: Array<{
-    county: string;
-    division: string;
+    county_name: string;
+    sub_county_name: string;
+    ward_name: string;
     polling_station: string;
     votes_per_station: number;
   }>;
@@ -284,14 +285,16 @@ const Results: React.FC = () => {
               <div className="location-table">
                 <div className="table-header">
                   <div>County</div>
-                  <div>Division</div>
+                  <div>Sub-County</div>
+                  <div>Ward</div>
                   <div>Polling Station</div>
                   <div>Votes</div>
                 </div>
                 {locationBreakdown.map((location, idx) => (
                   <div key={idx} className="table-row">
-                    <div>{location.county}</div>
-                    <div>{location.division}</div>
+                    <div>{location.county_name}</div>
+                    <div>{location.sub_county_name}</div>
+                    <div>{location.ward_name}</div>
                     <div>{location.polling_station}</div>
                     <div>{location.votes_per_station}</div>
                   </div>

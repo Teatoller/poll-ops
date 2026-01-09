@@ -8,7 +8,9 @@ import type {
   User,
   AdminAnalytics,
   ExportFormat,
-  DashboardStatistics
+  DashboardStatistics,
+  SurveyPoll,
+  SurveyResults
 } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -89,6 +91,23 @@ const adminApiFetch = async (endpoint: string, options: RequestInit = {}) => {
   });
 };
 
+// Normalize location fields from camelCase to snake_case for backend
+const mapLocationToSnake = (data: any) => {
+  const payload: any = { ...data };
+
+  if ('countyId' in data) payload.county_id = data.countyId;
+  if ('countyName' in data) payload.county_name = data.countyName;
+  if ('subCountyId' in data) payload.sub_county_id = data.subCountyId;
+  if ('subCountyName' in data) payload.sub_county_name = data.subCountyName;
+  if ('wardId' in data) payload.ward_id = data.wardId;
+  if ('wardName' in data) payload.ward_name = data.wardName;
+  if ('pollingStation' in data) payload.polling_station = data.pollingStation;
+
+  // keep camelCase keys as well so backend middleware that expects camelCase still receives them
+
+  return payload;
+};
+
 // Admin-specific API service
 export const adminAPI = {
   // Auth endpoints
@@ -122,6 +141,14 @@ export const adminAPI = {
     description: string;
     startDate: string;
     endDate: string;
+    scope?: 'NATIONAL' | 'COUNTY' | 'SUB_COUNTY' | 'WARD' | 'GENERAL';
+    countyId?: number | null;
+    countyName?: string | null;
+    subCountyId?: number | null;
+    subCountyName?: string | null;
+    wardId?: number | null;
+    wardName?: string | null;
+    pollingStation?: string | null;
     candidates: Omit<Candidate, 'id' | 'poll_id'>[];
   }) => {
     return adminApiFetch('/admin/polls', {
@@ -150,6 +177,14 @@ export const adminAPI = {
     startDate: string;
     endDate: string;
     is_active?: boolean;
+    scope?: 'NATIONAL' | 'COUNTY' | 'SUB_COUNTY' | 'WARD' | 'GENERAL';
+    countyId?: number | null;
+    countyName?: string | null;
+    subCountyId?: number | null;
+    subCountyName?: string | null;
+    wardId?: number | null;
+    wardName?: string | null;
+    pollingStation?: string | null;
     candidates?: Array<{
       id?: number;
       name: string;
@@ -201,9 +236,17 @@ export const adminAPI = {
   },
 
   updateUser: async (userId: number, userData: Partial<User>): Promise<User> => {
+    // Normalize location fields to snake_case for backend
+    const payload = mapLocationToSnake(userData || {});
+
+    // Also map some common camelCase fields if present
+    if ((userData as any).nationalId) payload.national_id = (userData as any).nationalId;
+    if ((userData as any).isEmailVerified !== undefined) payload.is_email_verified = (userData as any).isEmailVerified;
+    if ((userData as any).isPhoneVerified !== undefined) payload.is_phone_verified = (userData as any).isPhoneVerified;
+
     return adminApiFetch(`/admin/users/${userId}`, {
       method: 'PUT',
-      body: JSON.stringify(userData),
+      body: JSON.stringify(payload),
     });
   },
 
@@ -325,13 +368,126 @@ export const adminAPI = {
   },
 };
 
+// Survey API methods - MUST be defined before main api object
+export const surveyAPI = {
+  // Admin: Get all surveys (with optional filters)
+  getAdminSurveys: async (filters?: {
+    scope?: string;
+    isActive?: boolean;
+  }): Promise<SurveyPoll[]> => {
+    const params = new URLSearchParams();
+    if (filters?.scope) params.append('scope', filters.scope);
+    if (filters?.isActive !== undefined) params.append('is_active', String(filters.isActive));
+
+    const queryString = params.toString();
+    return adminApiFetch(`/admin/surveys${queryString ? `?${queryString}` : ''}`);
+  },
+
+  // Create a new survey (admin only)
+  createSurvey: async (surveyData: {
+    question: string;
+    description?: string;
+    startDate: string;
+    endDate: string;
+    scope: string;
+    countyId?: number;
+    subCountyId?: number;
+    wardId?: number;
+    options: Array<{ optionText: string }>;
+  }): Promise<SurveyPoll> => {
+    return adminApiFetch('/admin/surveys', {
+      method: 'POST',
+      body: JSON.stringify(surveyData),
+    });
+  },
+
+  // Get all surveys (with optional filters)
+  getSurveys: async (filters?: {
+    scope?: string;
+    isActive?: boolean;
+    countyId?: number;
+  }): Promise<SurveyPoll[]> => {
+    const params = new URLSearchParams();
+    if (filters?.scope) params.append('scope', filters.scope);
+    if (filters?.isActive !== undefined) params.append('is_active', String(filters.isActive));
+    if (filters?.countyId) params.append('county_id', String(filters.countyId));
+    
+    const queryString = params.toString();
+    return apiFetch(`/surveys${queryString ? `?${queryString}` : ''}`);
+  },
+
+  // Get survey by ID
+  getSurveyById: async (surveyId: number): Promise<SurveyPoll> => {
+    return apiFetch(`/surveys/${surveyId}`);
+  },
+
+  // Check if user has already voted in a survey
+  checkSurveyVoteStatus: async (surveyId: number): Promise<{ hasVoted: boolean; optionId?: number }> => {
+    return apiFetch(`/surveys/${surveyId}/vote-status`);
+  },
+
+  // Submit a survey vote
+  submitSurveyVote: async (voteData: {
+    surveyId: number;
+    optionId: number;
+  }): Promise<{ message: string; vote: any }> => {
+    return apiFetch('/surveys/vote', {
+      method: 'POST',
+      body: JSON.stringify(voteData),
+    });
+  },
+
+  // Get survey results
+  getSurveyResults: async (surveyId: number): Promise<SurveyResults> => {
+    return apiFetch(`/surveys/${surveyId}/results`);
+  },
+
+  // Admin: Update survey
+  updateSurvey: async (surveyId: number, surveyData: Partial<SurveyPoll>): Promise<SurveyPoll> => {
+    return adminApiFetch(`/admin/surveys/${surveyId}`, {
+      method: 'PUT',
+      body: JSON.stringify(surveyData),
+    });
+  },
+
+  // Admin: Toggle survey active status
+  toggleSurveyStatus: async (surveyId: number): Promise<{ message: string; is_active: boolean }> => {
+    return adminApiFetch(`/admin/surveys/${surveyId}/toggle`, {
+      method: 'PATCH',
+    });
+  },
+
+  // Admin: Delete survey
+  deleteSurvey: async (surveyId: number): Promise<{ message: string }> => {
+    return adminApiFetch(`/admin/surveys/${surveyId}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
 // Main API service for regular users
 export const api = {
   // Auth endpoints
   register: async (userData: RegisterData) => {
+    // Send registration payload using camelCase keys expected by backend validation
+    const payload: any = {
+      nationalId: userData.nationalId,
+      email: userData.email,
+      phone: userData.phone,
+      password: userData.password,
+      confirmPassword: userData.confirmPassword,
+      countyId: userData.countyId,
+      countyName: userData.countyName,
+      subCountyId: userData.subCountyId,
+      subCountyName: userData.subCountyName,
+      wardId: userData.wardId,
+      wardName: userData.wardName,
+      pollingStation: userData.pollingStation
+    };
+
     return apiFetch('/auth/register', {
       method: 'POST',
-      body: JSON.stringify(userData),
+      body: JSON.stringify(payload),
     });
   },
 
@@ -387,6 +543,19 @@ export const api = {
   checkVoteStatus: async (pollId: number): Promise<{ hasVoted: boolean }> => {
     return apiFetch(`/polls/has-voted/${pollId}`);
   },
+
+  // Survey endpoints
+  getSurveys: surveyAPI.getSurveys,
+  getSurveyById: surveyAPI.getSurveyById,
+  checkSurveyVoteStatus: surveyAPI.checkSurveyVoteStatus,
+  submitSurveyVote: surveyAPI.submitSurveyVote,
+  getSurveyResults: surveyAPI.getSurveyResults,
+  createSurvey: surveyAPI.createSurvey,
+  getAdminSurveys: surveyAPI.getAdminSurveys,
+  updateSurvey: surveyAPI.updateSurvey,
+  toggleSurveyStatus: surveyAPI.toggleSurveyStatus,
+  toggleSurveyActive: surveyAPI.toggleSurveyStatus, // alias for clarity in admin UI
+  deleteSurvey: surveyAPI.deleteSurvey,
 
   // Results endpoints
   getPollResults: async (pollId: number): Promise<any> => {
@@ -468,6 +637,28 @@ export const api = {
   },
 };
 
+// Resources API
+export const resourcesAPI = {
+  getCounties: async (): Promise<Array<{ id: number; name: string; code?: string }>> => {
+    return apiFetch('/resources/counties');
+  },
+  getSubCounties: async (countyId?: number): Promise<Array<{ id: number; countyId: number; name: string; code?: string }>> => {
+    const qp = countyId ? `?countyId=${countyId}` : '';
+    return apiFetch(`/resources/sub-counties${qp}`);
+  },
+  getWards: async (subCountyId?: number): Promise<Array<{ id: number; subCountyId: number; name: string; code?: string }>> => {
+    const qp = subCountyId ? `?subCountyId=${subCountyId}` : '';
+    return apiFetch(`/resources/wards${qp}`);
+  },
+  getPollingStations: async (wardId?: number): Promise<Array<{ id: number; wardId: number; name: string; code?: string }>> => {
+    const qp = wardId ? `?wardId=${wardId}` : '';
+    return apiFetch(`/resources/polling-stations${qp}`);
+  },
+  getCountryTree: async (): Promise<Array<{ id: number; name: string; subCounties: any[] }>> => {
+    return apiFetch('/resources/country-tree');
+  },
+};
+
 // Export types
 export type {
   LoginData,
@@ -478,5 +669,7 @@ export type {
   User,
   AdminAnalytics,
   ExportFormat,
-  DashboardStatistics
+  DashboardStatistics,
+  SurveyPoll,
+  SurveyResults
 };

@@ -11,8 +11,12 @@ interface UserManagementProps {
   email: string;
   nationalId: string;
   phone?: string;
-  county: string;
-  division: string;
+  countyId: number | null;
+  countyName: string;
+  subCountyId: number | null;
+  subCountyName: string;
+  wardId: number | null;
+  wardName: string;
   pollingStation: string;
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
@@ -48,8 +52,12 @@ const UserManagement: React.FC = () => {
         email: user.email,
         nationalId: user.nationalId || user.national_id || '',
         phone: user.phone,
-        county: user.county,
-        division: user.division || '',
+        countyId: user.countyId || user.county_id || null,
+        countyName: user.countyName || user.county_name || user.county || '',
+        subCountyId: user.subCountyId || user.sub_county_id || null,
+        subCountyName: user.subCountyName || user.sub_county_name || user.division || '',
+        wardId: user.wardId || user.ward_id || null,
+        wardName: user.wardName || user.ward_name || '',
         pollingStation: user.pollingStation || user.polling_station || '',
         isEmailVerified: user.isEmailVerified || user.is_email_verified || false,
         isPhoneVerified: user.isPhoneVerified || user.is_phone_verified || false,
@@ -71,9 +79,10 @@ const UserManagement: React.FC = () => {
   const filteredUsers = users.filter(user =>
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.nationalId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.county.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.division.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.pollingStation.toLowerCase().includes(searchTerm.toLowerCase())
+    (user.countyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (user.subCountyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (user.wardName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (user.pollingStation || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,14 +116,15 @@ const UserManagement: React.FC = () => {
 
   const handleExportUsers = () => {
     const csvContent = [
-      ['ID', 'Email', 'National ID', 'Phone', 'County', 'Division', 'Polling Station', 'Email Verified', 'Phone Verified', 'Created At', 'Votes'],
+      ['ID', 'Email', 'National ID', 'Phone', 'County', 'Sub County', 'Ward', 'Polling Station', 'Email Verified', 'Phone Verified', 'Created At', 'Votes'],
       ...filteredUsers.map(user => [
         user.id,
         user.email,
         user.nationalId,
         user.phone || '',
-        user.county,
-        user.division,
+        user.countyName,
+        user.subCountyName,
+        user.wardName,
         user.pollingStation,
         user.isEmailVerified ? 'Yes' : 'No',
         user.isPhoneVerified ? 'Yes' : 'No',
