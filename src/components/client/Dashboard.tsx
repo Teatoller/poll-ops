@@ -22,7 +22,6 @@ const Dashboard: React.FC = () => {
   });
 
   const { user, logout } = useAuth();
-  console.log("user--->>>", user)
   const navigate = useNavigate();
   const location = useLocation();
 
