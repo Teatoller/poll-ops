@@ -230,6 +230,7 @@ const Dashboard: React.FC = () => {
                     <button
                       onClick={() => handleViewResults(poll)}
                       className="action-button secondary"
+                      disabled={!userVotes[poll.id]}
                     >
                       Live Results
                     </button>
