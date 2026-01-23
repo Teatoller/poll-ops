@@ -69,7 +69,13 @@ const Dashboard: React.FC = () => {
       // 4. Check vote status for each survey
       const surveyVotes: { [surveyId: number]: boolean } = {};
       for (const survey of surveys) {
-        surveyVotes[survey.id] = survey.hasVoted || false;
+        try {
+          const status = await api.checkSurveyVoteStatus(survey.id);
+          surveyVotes[survey.id] = status.hasVoted;
+        } catch (error) {
+          console.error(`Error checking survey vote status for survey ${survey.id}:`, error);
+          surveyVotes[survey.id] = false;
+        }
       }
       setUserSurveyVotes(surveyVotes);
       

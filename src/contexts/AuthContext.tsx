@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (userData: RegisterData): Promise<void> => {
     try {
-      const response = await api.register(userData);
+      await api.register(userData);
 
       // Don't auto-login - user must verify email first
       // The backend sends verification email, user must click link before logging in

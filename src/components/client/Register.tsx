@@ -6,16 +6,6 @@ import LocationSelector from './LocationSelector';
 import type { LocationData, RegisterData } from '../../types';
 
 const Register: React.FC = () => {
-  // const [formData, setFormData] = useState<RegisterData>({
-  //   nationalId: '',
-  //   email: '',
-  //   phone: '',
-  //   password: '',
-  //   confirmPassword: '',
-  //   county: '',
-  //   division: '',
-  //   pollingStation: ''
-  // });
   const [formData, setFormData] = useState<RegisterData>({
     nationalId: '',
     email: '',
@@ -60,10 +50,6 @@ const Register: React.FC = () => {
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-
-    // if (!formData.pollingStation) {
-    //   newErrors.pollingStation = 'Polling station selection required';
-    // }
 
     if (!formData.pollingStation) {
       newErrors.pollingStation = 'Polling station selection required';

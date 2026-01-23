@@ -106,6 +106,7 @@ const SurveyResults: React.FC = () => {
   }
   
   const { survey, options, totalVotes } = surveyResults;
+  const safeVoteCount = totalVotes ?? 0;
 
   return (
     <div className="survey-results">
@@ -149,7 +150,7 @@ const SurveyResults: React.FC = () => {
           <div className="survey-meta-info">
             <div className="meta-badge">
               <span className="meta-label">Total Responses:</span>
-              <span className="meta-value">{totalVotes.toLocaleString()}</span>
+              <span className="meta-value">{safeVoteCount.toLocaleString()}</span>
             </div>
             <div className="meta-badge">
               <span className="meta-label">Status:</span>

@@ -99,6 +99,14 @@ export interface SurveyResults {
     is_active: boolean;
     totalVotes: number;
     scope: string;
+    countyId?: number | null;
+    countyName?: string | null;
+    subCountyId?: number | null;
+    subCountyName?: string | null;
+    wardId?: number | null;
+    wardName?: string | null;
+    pollingStation?: string | null;
+    createdAt?: string;
   };
   options: Array<{
     id: number;
@@ -113,11 +121,12 @@ export interface SurveyResults {
     polling_station: string;
     votes_per_station: number;
   }>;
-  summary: {
+  summary?: {
     totalVotes: number;
     totalOptions: number;
     votingStations: number;
   };
+  totalVotes?: number;
 }
 
 export interface AuthContextType {

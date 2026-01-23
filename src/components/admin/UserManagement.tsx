@@ -278,8 +278,8 @@ const UserManagement: React.FC = () => {
                 <td>{user.phone || 'N/A'}</td>
                 <td>
                   <div className="user-location">
-                    <span>{user.county}</span>
-                    <span className="location-detail">{user.division}, {user.pollingStation}</span>
+                    <span>{user.countyName || 'N/A'}</span>
+                    <span className="location-detail">{user.subCountyName || 'N/A'}, {user.pollingStation || 'N/A'}</span>
                   </div>
                 </td>
                 <td>
