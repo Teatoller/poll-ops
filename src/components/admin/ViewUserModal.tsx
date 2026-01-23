@@ -5,7 +5,6 @@ import '../../styles/createPollModal.css';
 interface User {
   id: number;
   email: string;
-  nationalId: string;
   phone?: string;
   countyId?: number;
   countyName?: string;
@@ -57,10 +56,7 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({ user, onClose }) => {
                 </span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">National ID:</span>
-                <span className="detail-value">{user.nationalId}</span>
-              </div>
-              <div className="detail-row">
+
                 <span className="detail-label">Phone:</span>
                 <span className="detail-value">
                   {user.phone || 'N/A'}

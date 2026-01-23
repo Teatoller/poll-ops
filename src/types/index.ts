@@ -2,7 +2,6 @@
 export interface User {
   id: number;
   email: string;
-  nationalId: string;
   phone?: string;
   county: string;
   division: string;
@@ -145,18 +144,6 @@ export interface Admin {
   email: string;
   role: string;
 }
-
-// export interface RegisterData {
-//   nationalId: string;
-//   email: string;
-//   phone: string;
-//   password: string;
-//   confirmPassword: string;
-//   county: string;
-//   division: string;
-//   pollingStation: string;
-// }
-
 export interface LocationData {
   countyId: number | null;
   countyName: string;
@@ -168,7 +155,6 @@ export interface LocationData {
 }
 
 export interface RegisterData extends LocationData {
-  nationalId: string;
   email: string;
   phone: string;
   password: string;
@@ -273,7 +259,6 @@ export interface SystemSettings {
   registration: {
     requireEmailVerification: boolean;
     requirePhoneVerification: boolean;
-    requireNationalId: boolean;
     allowMultipleRegistrations: boolean;
     registrationDeadline: number; // hours before poll starts
   };

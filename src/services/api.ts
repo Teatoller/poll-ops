@@ -240,7 +240,6 @@ export const adminAPI = {
     const payload = mapLocationToSnake(userData || {});
 
     // Also map some common camelCase fields if present
-    if ((userData as any).nationalId) payload.national_id = (userData as any).nationalId;
     if ((userData as any).isEmailVerified !== undefined) payload.is_email_verified = (userData as any).isEmailVerified;
     if ((userData as any).isPhoneVerified !== undefined) payload.is_phone_verified = (userData as any).isPhoneVerified;
 
@@ -471,7 +470,6 @@ export const api = {
   register: async (userData: RegisterData) => {
     // Send registration payload using camelCase keys expected by backend validation
     const payload: any = {
-      nationalId: userData.nationalId,
       email: userData.email,
       phone: userData.phone,
       password: userData.password,

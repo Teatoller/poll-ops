@@ -199,7 +199,7 @@ const ReportsExport = () => {
 
   const downloadTemplate = (type: string) => {
     const templates: Record<string, string> = {
-      users: `email,firstName,lastName,nationalId,countyId,countyName,subCountyId,subCountyName,wardId,wardName,pollingStation,isEmailVerified,createdAt`,
+      users: `email,firstName,lastName,countyId,countyName,subCountyId,subCountyName,wardId,wardName,pollingStation,isEmailVerified,createdAt`,
       votes: `userId,pollId,candidateId,countyName,createdAt`,
       polls: `officeName,description,startDate,endDate,isActive,createdAt`
     };
