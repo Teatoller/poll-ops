@@ -9,7 +9,6 @@ import '../../styles/userManagement.css';
 interface UserManagementProps {
   id: number;
   email: string;
-  nationalId: string;
   phone?: string;
   countyId: number | null;
   countyName: string;
@@ -50,7 +49,6 @@ const UserManagement: React.FC = () => {
       const transformedUsers: UserManagementProps[] = usersData.map((user: any) => ({
         id: user.id,
         email: user.email,
-        nationalId: user.nationalId || user.national_id || '',
         phone: user.phone,
         countyId: user.countyId || user.county_id || null,
         countyName: user.countyName || user.county_name || user.county || '',
@@ -78,7 +76,6 @@ const UserManagement: React.FC = () => {
   // Filter users based on search term
   const filteredUsers = users.filter(user =>
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.nationalId.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (user.countyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (user.subCountyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (user.wardName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -116,11 +113,10 @@ const UserManagement: React.FC = () => {
 
   const handleExportUsers = () => {
     const csvContent = [
-      ['ID', 'Email', 'National ID', 'Phone', 'County', 'Sub County', 'Ward', 'Polling Station', 'Email Verified', 'Phone Verified', 'Created At', 'Votes'],
+      ['ID', 'Email', 'Phone', 'County', 'Sub County', 'Ward', 'Polling Station', 'Email Verified', 'Phone Verified', 'Created At', 'Votes'],
       ...filteredUsers.map(user => [
         user.id,
         user.email,
-        user.nationalId,
         user.phone || '',
         user.countyName,
         user.subCountyName,
@@ -218,7 +214,7 @@ const UserManagement: React.FC = () => {
         <div className="header-actions">
           <input
             type="text"
-            placeholder="Search users by email, national ID, or location..."
+            placeholder="Search users by email or location..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -248,7 +244,6 @@ const UserManagement: React.FC = () => {
               </th>
               <th>ID</th>
               <th>Email</th>
-              <th>National ID</th>
               <th>Phone</th>
               <th>Location</th>
               <th>Verification</th>
@@ -274,7 +269,6 @@ const UserManagement: React.FC = () => {
                     {user.isEmailVerified && <span className="verified-badge">✓</span>}
                   </div>
                 </td>
-                <td>{user.nationalId}</td>
                 <td>{user.phone || 'N/A'}</td>
                 <td>
                   <div className="user-location">
@@ -321,7 +315,7 @@ const UserManagement: React.FC = () => {
             ))}
             {paginatedUsers.length === 0 && (
               <tr>
-                <td colSpan={10} className="no-data">
+                <td colSpan={9} className="no-data">
                   No users found
                 </td>
               </tr>

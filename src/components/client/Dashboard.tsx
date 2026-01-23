@@ -173,7 +173,6 @@ const Dashboard: React.FC = () => {
           <h3>Your Profile</h3>
           <div className="profile-details">
             <p><strong>Email:</strong> {user?.email}</p>
-            <p><strong>National ID:</strong> {user?.nationalId}</p>
             <p><strong>Polling Station:</strong> {user?.pollingStation}</p>
             <p><strong>Location:</strong> {user?.county}, {user?.division}</p>
             <div className="verification-status">

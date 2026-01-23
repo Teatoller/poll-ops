@@ -7,7 +7,6 @@ import type { LocationData, RegisterData } from '../../types';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState<RegisterData>({
-    nationalId: '',
     email: '',
     phone: '',
     password: '',
@@ -33,11 +32,6 @@ const Register: React.FC = () => {
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
-
-    // National ID validation (example for Kenya)
-    if (!/^\d{8}$/.test(formData.nationalId)) {
-      newErrors.nationalId = 'Valid National ID required (8 digits)';
-    }
 
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Valid email required';
@@ -121,21 +115,6 @@ const Register: React.FC = () => {
         <h2>Voter Registration</h2>
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="nationalId">National ID *</label>
-            <input
-              type="text"
-              id="nationalId"
-              name="nationalId"
-              value={formData.nationalId}
-              onChange={handleChange}
-              placeholder="Enter your 8-digit National ID"
-              className={errors.nationalId ? 'error' : ''}
-              required
-            />
-            {errors.nationalId && <span className="error-message">{errors.nationalId}</span>}
-          </div>
-
           <div className="form-group">
             <label htmlFor="email">Email *</label>
             <input

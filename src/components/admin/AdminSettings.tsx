@@ -287,27 +287,13 @@ const AdminSettings: React.FC = () => {
                 <label>
                   <input
                     type="checkbox"
-                    checked={settings.registration?.requireNationalId || true}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      registration: { ...settings.registration, requireNationalId: e.target.checked }
-                    })}
-                  />
-                  Require National ID
-                </label>
-              </div>
-
-              <div className="setting-item">
-                <label>
-                  <input
-                    type="checkbox"
                     checked={settings.registration?.allowMultipleRegistrations || false}
                     onChange={(e) => setSettings({
                       ...settings,
                       registration: { ...settings.registration, allowMultipleRegistrations: e.target.checked }
                     })}
                   />
-                  Allow multiple registrations per National ID
+                  Allow multiple registrations
                 </label>
                 <p className="setting-description">
                   Warning: Enabling this may allow duplicate voting
