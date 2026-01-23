@@ -308,6 +308,7 @@ const Dashboard: React.FC = () => {
                     <button
                       onClick={() => handleViewSurveyResults(survey)}
                       className="action-button secondary"
+                      disabled={!userSurveyVotes[survey.id]}
                     >
                       View Results
                     </button>
