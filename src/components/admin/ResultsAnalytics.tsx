@@ -15,6 +15,7 @@ import {
   Legend
 } from 'chart.js';
 import { api } from '../../services/api';
+import { useAdmin } from '../../contexts/AdminContext';
 
 ChartJS.register(
   CategoryScale,
@@ -42,6 +43,7 @@ interface AnalyticsData {
 
 const ResultsAnalytics: React.FC = () => {
   const location = useLocation();
+  const { can } = useAdmin();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('7d');
@@ -57,12 +59,16 @@ const ResultsAnalytics: React.FC = () => {
   }, [location.state]);
 
   useEffect(() => {
-    fetchPolls();
-  }, []);
+    if (can('viewAnalytics')) {
+      fetchPolls();
+    }
+  }, [can]);
 
   useEffect(() => {
-    fetchAnalytics();
-  }, [timeRange, selectedPollId]);
+    if (can('viewAnalytics')) {
+      fetchAnalytics();
+    }
+  }, [timeRange, selectedPollId, can]);
 
   const fetchPolls = async () => {
     try {
@@ -83,6 +89,17 @@ const ResultsAnalytics: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if (!can('viewAnalytics')) {
+    return (
+      <div className="results-analytics">
+        <div className="page-header">
+          <h2>Results Analytics</h2>
+        </div>
+        <div className="alert alert-error">You don't have permission to view analytics.</div>
+      </div>
+    );
+  }
 
   if (loading) return <div>Loading analytics...</div>;
 
@@ -243,7 +260,8 @@ const ResultsAnalytics: React.FC = () => {
           <p className="summary-number">
             {analytics && analytics.locationDistribution.length > 0
               ? analytics.locationDistribution.reduce((max, curr) => 
-                  curr.votes > max.votes ? curr : max
+                  curr.votes > max.votes ? curr : max,
+                  analytics.locationDistribution[0]
                 ).county
               : 'N/A'}
           </p>
