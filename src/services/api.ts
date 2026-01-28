@@ -658,6 +658,21 @@ export const api = {
   updateSettings: async (settings: any): Promise<{ message: string }> => {
     return adminAPI.updateSettings(settings);
   },
+
+  // ssss
+  forgotPassword: async (email: string): Promise<{ message: string }> => {
+    return apiFetch('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  resetPassword: async (token: string, password: string): Promise<{ message: string }> => {
+    return apiFetch(`/auth/reset-password/${token}`, {
+      method: 'POST',
+      body: JSON.stringify({ password }),
+    });
+  },
 };
 
 // Resources API

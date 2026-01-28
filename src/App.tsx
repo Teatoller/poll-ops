@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import './App.css'
 // import Dashboard from './components/Dashboard';
 import Register from './components/client/Register';
+import ForgotPassword from './components/client/ForgotPassword';
+import ResetPassword from './components/client/ResetPassword';
 import PollingStation from './components/client/PollingStation';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './components/client/Login';
@@ -48,6 +50,8 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:token" element={<ResetPassword />} />
               <Route path="/verify-email/:token" element={<VerifyEmail />} />
               <Route
                 path="/dashboard"
