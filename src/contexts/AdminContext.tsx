@@ -9,6 +9,8 @@ interface AdminContextType {
   adminLogin: (email: string, password: string) => Promise<void>;
   adminLogout: () => void;
   loading: boolean;
+  capabilities: Set<string>;
+  can: (permission: string) => boolean;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -28,6 +30,41 @@ interface AdminProviderProps {
 export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [capabilities, setCapabilities] = useState<Set<string>>(new Set());
+
+  // Frontend mirror of backend role capabilities
+  const roleCapabilities: Record<string, string[]> = {
+    superadmin: [
+      'viewPolls',
+      'managePolls',
+      'viewUsers',
+      'manageUsers',
+      'manageSurveys',
+      'viewAnalytics',
+      'exportData',
+      'manageAdmins'
+    ],
+    admin: [
+      'viewPolls',
+      'managePolls',
+      'viewUsers',
+      'manageUsers',
+      'manageSurveys',
+      'viewAnalytics',
+      'exportData'
+    ],
+    editor: [
+      'viewPolls',
+      'managePolls',
+      'manageSurveys',
+      'viewAnalytics'
+    ],
+    viewer: [
+      'viewPolls',
+      'viewUsers',
+      'viewAnalytics'
+    ]
+  };
 
   useEffect(() => {
     // Check for admin auth on mount
@@ -38,6 +75,8 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       try {
         const adminData: Admin = JSON.parse(savedAdmin);
         setAdmin(adminData);
+        const caps = new Set(roleCapabilities[adminData.role] || []);
+        setCapabilities(caps);
       } catch (error) {
         console.error('Error parsing saved admin data:', error);
         adminLogout();
@@ -53,6 +92,8 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       localStorage.setItem('adminToken', response.token);
       localStorage.setItem('adminData', JSON.stringify(response.admin));
       setAdmin(response.admin);
+      const caps = new Set(roleCapabilities[response.admin.role] || []);
+      setCapabilities(caps);
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : 'Admin login failed');
     }
@@ -62,15 +103,18 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminData');
     setAdmin(null);
+    setCapabilities(new Set());
     adminAPI.logout();
   };
 
-  const value: AdminContextType = {
+  const value: AdminContextType = React.useMemo(() => ({
     admin,
     adminLogin,
     adminLogout,
-    loading
-  };
+    loading,
+    capabilities,
+    can: (permission: string) => capabilities.has(permission)
+  }), [admin, loading, capabilities]);
 
   return (
     <AdminContext.Provider value={value}>

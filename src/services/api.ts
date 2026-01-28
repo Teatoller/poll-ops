@@ -365,6 +365,31 @@ export const adminAPI = {
       body: JSON.stringify({ webhookUrl }),
     });
   },
+
+  // Admin management endpoints
+  getAdmins: async (): Promise<Array<{ id: number; email: string; role: string }>> => {
+    return adminApiFetch('/admin/admins');
+  },
+
+  createAdmin: async (adminData: { email: string; password: string; role: string }): Promise<{ id: number; email: string; role: string }> => {
+    return adminApiFetch('/admin/admins', {
+      method: 'POST',
+      body: JSON.stringify(adminData),
+    });
+  },
+
+  updateAdmin: async (id: number, update: { email?: string; password?: string; role?: string }): Promise<{ id: number; email: string; role: string }> => {
+    return adminApiFetch(`/admin/admins/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(update),
+    });
+  },
+
+  deleteAdmin: async (id: number): Promise<{ message: string }> => {
+    return adminApiFetch(`/admin/admins/${id}`, {
+      method: 'DELETE',
+    });
+  },
 };
 
 // Survey API methods - MUST be defined before main api object

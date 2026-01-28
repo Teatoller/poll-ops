@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { api, adminAPI } from '../../services/api';
 import ViewUserModal from './ViewUserModal';
 import EditUserModal from './EditUserModal';
+import { useAdmin } from '../../contexts/AdminContext';
 import '../../styles/userManagement.css';
 // import type { User } from '../../types';
 
@@ -24,6 +25,7 @@ interface UserManagementProps {
 }
 
 const UserManagement: React.FC = () => {
+  const { can } = useAdmin();
   const [users, setUsers] = useState<UserManagementProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,8 +38,10 @@ const UserManagement: React.FC = () => {
   const [loadingUser, setLoadingUser] = useState(false);
 
   useEffect(() => {
-    fetchUsers();
-  }, [currentPage, searchTerm]);
+    if (can('viewUsers')) {
+      fetchUsers();
+    }
+  }, [currentPage, searchTerm, can]);
 
   const fetchUsers = async () => {
     try {
@@ -205,6 +209,17 @@ const UserManagement: React.FC = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
 
+  if (!can('viewUsers')) {
+    return (
+      <div className="user-management">
+        <div className="page-header">
+          <h2>User Management</h2>
+        </div>
+        <div className="alert alert-error">You don't have permission to view users.</div>
+      </div>
+    );
+  }
+
   if (loading) return <div className="loading">Loading users...</div>;
 
   return (
@@ -223,7 +238,7 @@ const UserManagement: React.FC = () => {
             Export CSV
           </button>
           {selectedUsers.length > 0 && (
-            <button onClick={handleDeleteUsers} className="btn-danger">
+            <button onClick={handleDeleteUsers} className="btn-danger" disabled={!can('manageUsers')}>
               Delete Selected ({selectedUsers.length})
             </button>
           )}
@@ -299,14 +314,14 @@ const UserManagement: React.FC = () => {
                   <button 
                     className="btn-action btn-edit"
                     onClick={() => handleEditUser(user.id)}
-                    disabled={loadingUser}
+                    disabled={loadingUser || !can('manageUsers')}
                   >
                     Edit
                   </button>
                   <button 
                     className="btn-action btn-delete"
                     onClick={() => handleDeleteUser(user.id, user.email)}
-                    disabled={loadingUser}
+                    disabled={loadingUser || !can('manageUsers')}
                   >
                     Delete
                   </button>

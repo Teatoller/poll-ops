@@ -18,6 +18,7 @@ import AdminLogin from './components/admin/AdminLogin';
 import { AdminProvider } from './contexts/AdminContext';
 import AdminSettings from './components/admin/AdminSettings';
 import AdminProtectedRoute from './components/admin/ProtectedRoute';
+import AdminsManagement from './components/admin/AdminsManagement';
 import VerifyEmail from './components/client/VerifyEmail';
 import Dashboard from './components/client/Dashboard';
 import SurveyVoting from './components/client/SurveyVoting';
@@ -105,6 +106,7 @@ const App: React.FC = () => {
                 <Route path="users" element={<UserManagement />} />
                 <Route path="results" element={<ResultsAnalytics />} />
                 <Route path="reports" element={<ReportsExport />} />
+                <Route path="admins" element={<AdminsManagement />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
 
