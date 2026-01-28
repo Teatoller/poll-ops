@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { adminAPI } from '../../services/api';
 import { useAdmin } from '../../contexts/AdminContext';
+import '../../styles/adminsManagement.css';
 
 interface AdminItem {
   id: number;
