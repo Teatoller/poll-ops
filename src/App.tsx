@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import './App.css'
 // import Dashboard from './components/Dashboard';
 import Register from './components/client/Register';
+import ForgotPassword from './components/client/ForgotPassword';
+import ResetPassword from './components/client/ResetPassword';
 import PollingStation from './components/client/PollingStation';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './components/client/Login';
@@ -18,6 +20,7 @@ import AdminLogin from './components/admin/AdminLogin';
 import { AdminProvider } from './contexts/AdminContext';
 import AdminSettings from './components/admin/AdminSettings';
 import AdminProtectedRoute from './components/admin/ProtectedRoute';
+import AdminsManagement from './components/admin/AdminsManagement';
 import VerifyEmail from './components/client/VerifyEmail';
 import Dashboard from './components/client/Dashboard';
 import SurveyVoting from './components/client/SurveyVoting';
@@ -47,6 +50,8 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:token" element={<ResetPassword />} />
               <Route path="/verify-email/:token" element={<VerifyEmail />} />
               <Route
                 path="/dashboard"
@@ -105,6 +110,7 @@ const App: React.FC = () => {
                 <Route path="users" element={<UserManagement />} />
                 <Route path="results" element={<ResultsAnalytics />} />
                 <Route path="reports" element={<ReportsExport />} />
+                <Route path="admins" element={<AdminsManagement />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
 

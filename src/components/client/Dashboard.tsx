@@ -173,7 +173,6 @@ const Dashboard: React.FC = () => {
           <h3>Your Profile</h3>
           <div className="profile-details">
             <p><strong>Email:</strong> {user?.email}</p>
-            <p><strong>National ID:</strong> {user?.nationalId}</p>
             <p><strong>Polling Station:</strong> {user?.pollingStation}</p>
             <p><strong>Location:</strong> {user?.county}, {user?.division}</p>
             <div className="verification-status">
@@ -230,6 +229,7 @@ const Dashboard: React.FC = () => {
                     <button
                       onClick={() => handleViewResults(poll)}
                       className="action-button secondary"
+                      disabled={!userVotes[poll.id]}
                     >
                       Live Results
                     </button>
@@ -308,6 +308,7 @@ const Dashboard: React.FC = () => {
                     <button
                       onClick={() => handleViewSurveyResults(survey)}
                       className="action-button secondary"
+                      disabled={!userSurveyVotes[survey.id]}
                     >
                       View Results
                     </button>

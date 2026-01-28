@@ -5,7 +5,7 @@ import { useAdmin } from '../../contexts/AdminContext';
 import '../../styles/admin.css';
 
 const AdminLayout: React.FC = () => {
-  const { admin, adminLogout, loading } = useAdmin();
+  const { admin, adminLogout, loading, can } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -62,24 +62,46 @@ const AdminLayout: React.FC = () => {
             Dashboard
           </Link>
           
-          <Link to="/admin/polls" className={`nav-item ${isActive('/admin/polls')}`}>
+          {can('viewPolls') && (
+            <Link to="/admin/polls" className={`nav-item ${isActive('/admin/polls')}`}>
             <span className="nav-icon">🗳️</span>
             Poll Management
-          </Link>
+            </Link>
+          )}
           
-          <Link to="/admin/users" className={`nav-item ${isActive('/admin/users')}`}>
+          {can('viewUsers') && (
+            <Link to="/admin/users" className={`nav-item ${isActive('/admin/users')}`}>
             <span className="nav-icon">👥</span>
             User Management
-          </Link>
+            </Link>
+          )}
           
-          <Link to="/admin/results" className={`nav-item ${isActive('/admin/results')}`}>
+          {can('viewAnalytics') && (
+            <Link to="/admin/results" className={`nav-item ${isActive('/admin/results')}`}>
             <span className="nav-icon">📈</span>
             Results Analytics
-          </Link>
+            </Link>
+          )}
           
-          <Link to="/admin/reports" className={`nav-item ${isActive('/admin/reports')}`}>
+          {can('exportData') && (
+            <Link to="/admin/reports" className={`nav-item ${isActive('/admin/reports')}`}>
             <span className="nav-icon">📄</span>
             Reports & Export
+            </Link>
+          )}
+          
+          <Link 
+            to="/admin/admins" 
+            className={`nav-item ${isActive('/admin/admins')} ${can('manageAdmins') ? '' : 'disabled'}`}
+            aria-disabled={!can('manageAdmins')}
+            onClick={(e) => {
+              if (!can('manageAdmins')) {
+                e.preventDefault();
+              }
+            }}
+          >
+            <span className="nav-icon">🛡️</span>
+            Admin Management
           </Link>
           
           <Link to="/admin/settings" className={`nav-item ${isActive('/admin/settings')}`}>

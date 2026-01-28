@@ -6,7 +6,6 @@ import LocationSelector from '../client/LocationSelector';
 interface User {
   id: number;
   email: string;
-  nationalId: string;
   phone?: string;
   countyId?: number | null;
   countyName?: string;
@@ -75,7 +74,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSave }) 
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>Edit User - {user.nationalId}</h3>
+          <h3>Edit User</h3>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
@@ -141,7 +140,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSave }) 
             </div>
 
             <div className="info-note">
-              <strong>Note:</strong> National ID cannot be changed. User registered on{' '}
+              <strong>Note:</strong> User registered on{' '}
               {new Date(user.createdAt).toLocaleDateString()} with {user.voteCount} vote(s).
             </div>
           </div>

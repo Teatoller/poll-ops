@@ -5,6 +5,7 @@ import type { SurveyPoll } from '../../types';
 import EditPollModal from './EditPollModal';
 import CreatePollModal from './CreatePollModal';
 import CreateSurveyPollModal from './CreateSurveyPollModal';
+import { useAdmin } from '../../contexts/AdminContext';
 import '../../styles/pollManagement.css';
 
 interface Poll {
@@ -26,6 +27,7 @@ interface Poll {
 }
 
 const PollManagement: React.FC = () => {
+  const { can } = useAdmin();
   const [activeTab, setActiveTab] = useState<'polls' | 'surveys'>('polls');
   const [polls, setPolls] = useState<Poll[]>([]);
   const [surveys, setSurveys] = useState<SurveyPoll[]>([]);
@@ -37,11 +39,15 @@ const PollManagement: React.FC = () => {
 
   useEffect(() => {
     if (activeTab === 'polls') {
-      fetchPolls();
-    } else {
+      if (can('viewPolls')) {
+        fetchPolls();
+      }
+      return;
+    }
+    if (can('manageSurveys') || can('viewPolls')) {
       fetchSurveys();
     }
-  }, [activeTab]);
+  }, [activeTab, can]);
 
   const fetchPolls = async () => {
     try {
@@ -227,6 +233,7 @@ const PollManagement: React.FC = () => {
                     className="btn-action btn-edit"
                     title="Edit poll"
                     type="button"
+                    disabled={!can('managePolls')}
                   >
                     Edit
                   </button>
@@ -235,6 +242,7 @@ const PollManagement: React.FC = () => {
                     className={`btn-action ${poll.is_active ? 'btn-deactivate' : 'btn-activate'}`}
                     title={poll.is_active ? 'Deactivate poll' : 'Activate poll'}
                     type="button"
+                    disabled={!can('managePolls')}
                   >
                     {poll.is_active ? 'Deactivate' : 'Activate'}
                   </button>
@@ -242,8 +250,8 @@ const PollManagement: React.FC = () => {
                     onClick={() => handleDeletePoll(poll.id)}
                     className="btn-action btn-delete"
                     title="Delete poll"
-                    disabled={(poll.totalVotes || 0) > 0}
                     type="button"
+                    disabled={!can('managePolls') || (poll.totalVotes || 0) > 0}
                   >
                     Delete
                   </button>
@@ -314,6 +322,7 @@ const PollManagement: React.FC = () => {
                     className={`btn-action ${survey.is_active ? 'btn-deactivate' : 'btn-activate'}`}
                     title={survey.is_active ? 'Deactivate survey' : 'Activate survey'}
                     type="button"
+                    disabled={!can('manageSurveys')}
                   >
                     {survey.is_active ? 'Deactivate' : 'Activate'}
                   </button>
@@ -321,8 +330,8 @@ const PollManagement: React.FC = () => {
                     onClick={() => handleDeleteSurvey(survey.id)}
                     className="btn-action btn-delete"
                     title="Delete survey"
-                    disabled={(survey.totalVotes || 0) > 0}
                     type="button"
+                    disabled={!can('manageSurveys') || (survey.totalVotes || 0) > 0}
                   >
                     Delete
                   </button>
@@ -356,6 +365,7 @@ const PollManagement: React.FC = () => {
             onClick={() => setShowCreateModal(true)}
             className="btn-primary"
             type="button"
+            disabled={!can('managePolls')}
           >
             + Create Election Poll
           </button>
@@ -363,6 +373,7 @@ const PollManagement: React.FC = () => {
             onClick={() => setShowCreateSurveyModal(true)}
             className="btn-primary btn-survey"
             type="button"
+            disabled={!can('manageSurveys')}
           >
             + Create Survey Poll
           </button>
@@ -400,93 +411,14 @@ const PollManagement: React.FC = () => {
         </div>
       ) : activeTab === 'polls' ? pollsContent : surveysContent}
 
-      <div className="polls-table-container">
-        <table className="polls-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Office Name</th>
-              <th>Description</th>
-              <th>Start Date</th>
-              <th>End Date</th>
-              <th>Candidates</th>
-              <th>Votes</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {polls.map(poll => (
-              <tr key={poll.id}>
-                <td>#{poll.id}</td>
-                <td>{poll.officeName}</td>
-                <td className="description-cell">
-                  {poll.description.length > 50 
-                    ? `${poll.description.substring(0, 50)}...` 
-                    : poll.description}
-                </td>
-                <td>{new Date(poll.startDate).toLocaleDateString()}</td>
-                <td>{new Date(poll.endDate).toLocaleDateString()}</td>
-                <td>{poll.candidateCount || poll.candidates?.length || 0}</td>
-                <td>{(poll.totalVotes || 0).toLocaleString()}</td>
-                <td>
-                  <span className={`status-badge ${poll.is_active ? 'status-active' : 'status-inactive'}`}>
-                    {poll.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button 
-                      // onClick={() => setEditingPoll(poll)}
-                      onClick={() => handleEditPoll(poll)}
-                      className="btn-action btn-edit"
-                      title="Edit poll"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleToggleActive(poll.id, poll.is_active)}
-                      className={`btn-action ${poll.is_active ? 'btn-deactivate' : 'btn-activate'}`}
-                      title={poll.is_active ? 'Deactivate poll' : 'Activate poll'}
-                    >
-                      {poll.is_active ? 'Deactivate' : 'Activate'}
-                    </button>
-                    <button 
-                      onClick={() => handleDeletePoll(poll.id)}
-                      className="btn-action btn-delete"
-                      title="Delete poll"
-                      disabled={(poll.totalVotes || 0) > 0}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                  {(poll.totalVotes || 0) > 0 && (
-                    <div className="delete-hint">
-                      Cannot delete poll with votes
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {polls.length === 0 && (
-              <tr>
-                <td colSpan={9} className="no-data">
-                  No polls found. Create your first poll!
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {showCreateModal && (
+      {showCreateModal && can('managePolls') && (
         <CreatePollModal
           onClose={() => setShowCreateModal(false)}
           onSubmit={handleCreatePoll}
         />
       )}
 
-      {showCreateSurveyModal && (
+      {showCreateSurveyModal && can('manageSurveys') && (
         <CreateSurveyPollModal
           onClose={() => setShowCreateSurveyModal(false)}
           onSubmit={handleCreateSurvey}

@@ -3,13 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { api, adminAPI } from '../../services/api';
 import ViewUserModal from './ViewUserModal';
 import EditUserModal from './EditUserModal';
+import { useAdmin } from '../../contexts/AdminContext';
 import '../../styles/userManagement.css';
 // import type { User } from '../../types';
 
 interface UserManagementProps {
   id: number;
   email: string;
-  nationalId: string;
   phone?: string;
   countyId: number | null;
   countyName: string;
@@ -25,6 +25,7 @@ interface UserManagementProps {
 }
 
 const UserManagement: React.FC = () => {
+  const { can } = useAdmin();
   const [users, setUsers] = useState<UserManagementProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,8 +38,10 @@ const UserManagement: React.FC = () => {
   const [loadingUser, setLoadingUser] = useState(false);
 
   useEffect(() => {
-    fetchUsers();
-  }, [currentPage, searchTerm]);
+    if (can('viewUsers')) {
+      fetchUsers();
+    }
+  }, [currentPage, searchTerm, can]);
 
   const fetchUsers = async () => {
     try {
@@ -50,7 +53,6 @@ const UserManagement: React.FC = () => {
       const transformedUsers: UserManagementProps[] = usersData.map((user: any) => ({
         id: user.id,
         email: user.email,
-        nationalId: user.nationalId || user.national_id || '',
         phone: user.phone,
         countyId: user.countyId || user.county_id || null,
         countyName: user.countyName || user.county_name || user.county || '',
@@ -78,7 +80,6 @@ const UserManagement: React.FC = () => {
   // Filter users based on search term
   const filteredUsers = users.filter(user =>
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.nationalId.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (user.countyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (user.subCountyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (user.wardName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -116,11 +117,10 @@ const UserManagement: React.FC = () => {
 
   const handleExportUsers = () => {
     const csvContent = [
-      ['ID', 'Email', 'National ID', 'Phone', 'County', 'Sub County', 'Ward', 'Polling Station', 'Email Verified', 'Phone Verified', 'Created At', 'Votes'],
+      ['ID', 'Email', 'Phone', 'County', 'Sub County', 'Ward', 'Polling Station', 'Email Verified', 'Phone Verified', 'Created At', 'Votes'],
       ...filteredUsers.map(user => [
         user.id,
         user.email,
-        user.nationalId,
         user.phone || '',
         user.countyName,
         user.subCountyName,
@@ -209,6 +209,17 @@ const UserManagement: React.FC = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
 
+  if (!can('viewUsers')) {
+    return (
+      <div className="user-management">
+        <div className="page-header">
+          <h2>User Management</h2>
+        </div>
+        <div className="alert alert-error">You don't have permission to view users.</div>
+      </div>
+    );
+  }
+
   if (loading) return <div className="loading">Loading users...</div>;
 
   return (
@@ -218,7 +229,7 @@ const UserManagement: React.FC = () => {
         <div className="header-actions">
           <input
             type="text"
-            placeholder="Search users by email, national ID, or location..."
+            placeholder="Search users by email or location..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -227,7 +238,7 @@ const UserManagement: React.FC = () => {
             Export CSV
           </button>
           {selectedUsers.length > 0 && (
-            <button onClick={handleDeleteUsers} className="btn-danger">
+            <button onClick={handleDeleteUsers} className="btn-danger" disabled={!can('manageUsers')}>
               Delete Selected ({selectedUsers.length})
             </button>
           )}
@@ -248,7 +259,6 @@ const UserManagement: React.FC = () => {
               </th>
               <th>ID</th>
               <th>Email</th>
-              <th>National ID</th>
               <th>Phone</th>
               <th>Location</th>
               <th>Verification</th>
@@ -274,7 +284,6 @@ const UserManagement: React.FC = () => {
                     {user.isEmailVerified && <span className="verified-badge">✓</span>}
                   </div>
                 </td>
-                <td>{user.nationalId}</td>
                 <td>{user.phone || 'N/A'}</td>
                 <td>
                   <div className="user-location">
@@ -305,14 +314,14 @@ const UserManagement: React.FC = () => {
                   <button 
                     className="btn-action btn-edit"
                     onClick={() => handleEditUser(user.id)}
-                    disabled={loadingUser}
+                    disabled={loadingUser || !can('manageUsers')}
                   >
                     Edit
                   </button>
                   <button 
                     className="btn-action btn-delete"
                     onClick={() => handleDeleteUser(user.id, user.email)}
-                    disabled={loadingUser}
+                    disabled={loadingUser || !can('manageUsers')}
                   >
                     Delete
                   </button>
@@ -321,7 +330,7 @@ const UserManagement: React.FC = () => {
             ))}
             {paginatedUsers.length === 0 && (
               <tr>
-                <td colSpan={10} className="no-data">
+                <td colSpan={9} className="no-data">
                   No users found
                 </td>
               </tr>

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useAdmin } from '../../contexts/AdminContext';
 
 import '../../styles/reportsExport.css';
 
@@ -35,6 +36,7 @@ const ReportsExport = () => {
   const [recentExports, setRecentExports] = useState<ExportRecord[]>([]);
   
   const { admin } = useAuth();
+  const { can } = useAdmin();
 
   useEffect(() => {
     fetchPolls();
@@ -64,6 +66,10 @@ const ReportsExport = () => {
   };
 
   const handleExport = async () => {
+    if (!can('exportData')) {
+      alert("You don't have permission to export data.");
+      return;
+    }
     try {
       setExporting(true);
       
@@ -140,6 +146,10 @@ const ReportsExport = () => {
   };
 
   const previewData = async () => {
+    if (!can('exportData')) {
+      alert("You don't have permission to preview/export data.");
+      return;
+    }
     try {
       setLoading(true);
       
@@ -198,8 +208,12 @@ const ReportsExport = () => {
   };
 
   const downloadTemplate = (type: string) => {
+    if (!can('exportData')) {
+      alert("You don't have permission to download templates.");
+      return;
+    }
     const templates: Record<string, string> = {
-      users: `email,firstName,lastName,nationalId,countyId,countyName,subCountyId,subCountyName,wardId,wardName,pollingStation,isEmailVerified,createdAt`,
+      users: `email,firstName,lastName,countyId,countyName,subCountyId,subCountyName,wardId,wardName,pollingStation,isEmailVerified,createdAt`,
       votes: `userId,pollId,candidateId,countyName,createdAt`,
       polls: `officeName,description,startDate,endDate,isActive,createdAt`
     };
@@ -327,7 +341,7 @@ const ReportsExport = () => {
               
               <button
                 onClick={handleExport}
-                disabled={exporting}
+                disabled={exporting || !can('exportData')}
                 className="btn btn-primary btn-export"
               >
                 {exporting ? (
@@ -407,6 +421,7 @@ const ReportsExport = () => {
                   handleExport();
                 }}
                 className="quick-export-btn"
+                disabled={!can('exportData')}
               >
                 <i className="fas fa-vote-yea"></i>
                 <span>Today's Votes</span>
@@ -420,6 +435,7 @@ const ReportsExport = () => {
                   handleExport();
                 }}
                 className="quick-export-btn"
+                disabled={!can('exportData')}
               >
                 <i className="fas fa-users"></i>
                 <span>Active Users</span>
@@ -432,6 +448,7 @@ const ReportsExport = () => {
                   handleExport();
                 }}
                 className="quick-export-btn"
+                disabled={!can('exportData')}
               >
                 <i className="fas fa-poll"></i>
                 <span>All Polls</span>
