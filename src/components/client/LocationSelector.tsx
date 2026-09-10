@@ -79,8 +79,9 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, onLocatio
   return (
     <div className="location-selector">
       <div className="form-group">
-        <label>County *</label>
+        <label htmlFor="county-select">County *</label>
         <select
+          id="county-select"
           value={county?.id ?? ''}
           onChange={(e) => {
             const selected = tree.find(c => c.id === Number(e.target.value)) || null;
@@ -99,8 +100,9 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, onLocatio
       </div>
 
       <div className="form-group">
-        <label>Sub County *</label>
+        <label htmlFor="subcounty-select">Sub County *</label>
         <select
+          id="subcounty-select"
           value={subCounty?.id ?? ''}
           disabled={!county || disabled}
           onChange={(e) => {
@@ -118,8 +120,9 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, onLocatio
       </div>
 
       <div className="form-group">
-        <label>Ward *</label>
+        <label htmlFor="ward-select">Ward *</label>
         <select
+          id="ward-select"
           value={ward?.id ?? ''}
           disabled={!subCounty || disabled}
           onChange={(e) => {
@@ -136,8 +139,9 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ onSelect, onLocatio
       </div>
 
       <div className="form-group">
-        <label>Polling Station *</label>
+        <label htmlFor="polling-select">Polling Station *</label>
         <select
+          id="polling-select"
           value={pollingStation}
           disabled={!ward || disabled}
           onChange={(e) => setPollingStation(e.target.value)}
