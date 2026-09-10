@@ -1,5 +1,6 @@
 // src/components/Register.tsx
 import React, { useState, useEffect, useCallback } from 'react';
+import PasswordField from '../common/PasswordField';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import LocationSelector from './LocationSelector';
@@ -22,8 +23,6 @@ const Register: React.FC = () => {
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
 
   const { register, user } = useAuth();
   const navigate = useNavigate();
@@ -148,77 +147,30 @@ const Register: React.FC = () => {
 
           <div className="form-group">
             <label htmlFor="password">Password *</label>
-            <div style={{ position: 'relative' }}>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Create password"
-                className={errors.password ? 'error' : ''}
-                required
-                style={{ paddingRight: '2.5rem' }}
-              />
-              <button
-                type="button"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                onClick={() => setShowPassword((prev) => !prev)}
-                style={{
-                  position: 'absolute',
-                  right: '0.5rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                  fontSize: '1.1rem',
-                  color: '#6b7280'
-                }}
-                tabIndex={0}
-              >
-                {showPassword ? '🙈' : '👁️'}
-              </button>
-            </div>
+            <PasswordField
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Create password"
+              className={errors.password ? 'error' : ''}
+              required
+            />
             {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
 
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm Password *</label>
-            <div style={{ position: 'relative' }}>
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirm password"
-                className={errors.confirmPassword ? 'error' : ''}
-                required
-                style={{ paddingRight: '2.5rem' }}
-              />
-              <button
-                type="button"
-                aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
-                style={{
-                  position: 'absolute',
-                  right: '0.5rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                  fontSize: '1.1rem',
-                  color: '#6b7280'
-                }}
-                tabIndex={0}
-              >
-                {showConfirmPassword ? '🙈' : '👁️'}
-              </button>
-            </div>
+            <PasswordField
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm password"
+              className={errors.confirmPassword ? 'error' : ''}
+              required
+              toggleAriaLabel="Show confirm password"
+            />
             {errors.confirmPassword && (
               <span className="error-message">{errors.confirmPassword}</span>
             )}
