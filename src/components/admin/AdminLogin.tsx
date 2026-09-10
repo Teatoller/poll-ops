@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../../styles/adminLogin.css';
 import { useAdmin } from '../../contexts/AdminContext';
+import PasswordField from '../common/PasswordField';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -68,8 +69,7 @@ const AdminLogin = () => {
           
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
+            <PasswordField
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

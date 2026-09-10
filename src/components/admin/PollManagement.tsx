@@ -5,6 +5,7 @@ import type { SurveyPoll } from '../../types';
 import EditPollModal from './EditPollModal';
 import CreatePollModal from './CreatePollModal';
 import CreateSurveyPollModal from './CreateSurveyPollModal';
+import EditSurveyPollModal from './EditSurveyPollModal';
 import { useAdmin } from '../../contexts/AdminContext';
 import '../../styles/pollManagement.css';
 
@@ -35,6 +36,7 @@ const PollManagement: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateSurveyModal, setShowCreateSurveyModal] = useState(false);
   const [editingPoll, setEditingPoll] = useState<Poll | null>(null);
+  const [editingSurvey, setEditingSurvey] = useState<SurveyPoll | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -119,6 +121,20 @@ const PollManagement: React.FC = () => {
     } catch (error: any) {
       setError(error.message || 'Failed to toggle survey status');
       console.error('Error toggling survey:', error);
+    }
+  };
+
+  const handleUpdateSurvey = async (surveyData: Parameters<typeof api.updateSurvey>[1]) => {
+    if (!editingSurvey) return;
+
+    try {
+      setError('');
+      await api.updateSurvey(editingSurvey.id, surveyData);
+      setEditingSurvey(null);
+      fetchSurveys();
+    } catch (error: any) {
+      setError(error.message || 'Failed to update survey');
+      throw error;
     }
   };
 
@@ -318,6 +334,15 @@ const PollManagement: React.FC = () => {
               <td>
                 <div className="action-buttons">
                   <button 
+                    onClick={() => setEditingSurvey(survey)}
+                    className="btn-action btn-edit"
+                    title="Edit survey"
+                    type="button"
+                    disabled={!can('manageSurveys') || (survey.totalVotes || 0) > 0}
+                  >
+                    Edit
+                  </button>
+                  <button 
                     onClick={() => handleToggleSurveyActive(survey.id)}
                     className={`btn-action ${survey.is_active ? 'btn-deactivate' : 'btn-activate'}`}
                     title={survey.is_active ? 'Deactivate survey' : 'Activate survey'}
@@ -338,7 +363,7 @@ const PollManagement: React.FC = () => {
                 </div>
                 {(survey.totalVotes || 0) > 0 && (
                   <div className="delete-hint">
-                    Cannot delete survey with votes
+                    Cannot edit or delete survey with votes
                   </div>
                 )}
               </td>
@@ -430,6 +455,14 @@ const PollManagement: React.FC = () => {
           poll={editingPoll}
           onClose={() => setEditingPoll(null)}
           onSave={handleUpdatePoll}
+        />
+      )}
+
+      {editingSurvey && can('manageSurveys') && (editingSurvey.totalVotes || 0) === 0 && (
+        <EditSurveyPollModal
+          survey={editingSurvey}
+          onClose={() => setEditingSurvey(null)}
+          onSave={handleUpdateSurvey}
         />
       )}
     </div>

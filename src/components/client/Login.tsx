@@ -1,5 +1,6 @@
 // src/components/Login.tsx
 import React, { useState, useEffect } from 'react';
+import PasswordField from '../common/PasswordField';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import type { LoginData } from '../../types';
@@ -12,7 +13,6 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
-  const [showPassword, setShowPassword] = useState<boolean>(false);
   
   const { login, user } = useAuth();
   const navigate = useNavigate();
@@ -113,38 +113,14 @@ const Login: React.FC = () => {
 
           <div className="form-group">
             <label htmlFor="password">Password *</label>
-            <div style={{ position: 'relative' }}>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Enter your password"
-                className={errors.password ? 'error' : ''}
-                style={{ paddingRight: '2.5rem' }}
-              />
-              <button
-                type="button"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                onClick={() => setShowPassword((prev) => !prev)}
-                style={{
-                  position: 'absolute',
-                  right: '0.5rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                  fontSize: '1.1rem',
-                  color: '#6b7280'
-                }}
-                tabIndex={0}
-              >
-                {showPassword ? '🙈' : '👁️'}
-              </button>
-            </div>
+            <PasswordField
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter your password"
+              className={errors.password ? 'error' : ''}
+            />
             {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
 

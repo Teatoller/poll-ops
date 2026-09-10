@@ -880,6 +880,10 @@
   border-radius: 6px;
   font-size: 16px;
   background: white;
+  color: #333; /* ensure selected text is legible */
+  -webkit-appearance: auto; /* restore native dropdown arrow */
+  -moz-appearance: auto;
+  appearance: auto;
   transition: border-color 0.3s;
 }
 

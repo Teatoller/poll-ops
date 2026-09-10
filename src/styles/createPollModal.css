@@ -181,6 +181,135 @@
   font-size: 1.1rem;
 }
 
+.section-header-with-action h4 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.1rem;
+}
+
+.survey-modal-content,
+.poll-modal-content,
+.edit-poll-modal-content {
+  color: #1f2937;
+}
+
+.survey-modal-content h4,
+.poll-modal-content h4,
+.edit-poll-modal-content h4,
+.survey-modal-content .form-group label,
+.poll-modal-content .form-group label,
+.edit-poll-modal-content .form-group label,
+.survey-modal-content .option-number,
+.poll-modal-content .candidate-number,
+.edit-poll-modal-content .candidate-header h4,
+.edit-poll-modal-content .checkbox-label,
+.edit-poll-modal-content .section-header label {
+  color: #1f2937;
+}
+
+.survey-modal-content small,
+.survey-modal-content .form-helper,
+.poll-modal-content .input-hint,
+.poll-modal-content .section-description,
+.poll-modal-content .candidate-count,
+.edit-poll-modal-content .input-hint {
+  color: #4b5563;
+}
+
+.survey-modal-content select,
+.poll-modal-content select,
+.edit-poll-modal-content select {
+  color: #1f2937;
+  background-color: #ffffff;
+  border: 2px solid #9ca3af;
+  min-height: 3rem;
+  cursor: pointer;
+}
+
+.edit-poll-modal-content .candidate-fields input,
+.edit-poll-modal-content .candidate-fields textarea {
+  color: #1f2937;
+  background-color: #ffffff;
+  border: 2px solid #d1d5db;
+}
+
+.edit-poll-modal-content .form-group input,
+.edit-poll-modal-content .form-group textarea {
+  color: #1f2937;
+  background-color: #ffffff;
+}
+
+.edit-poll-modal-content .form-group input::placeholder,
+.edit-poll-modal-content .form-group textarea::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
+.edit-poll-modal-content .form-group input:focus,
+.edit-poll-modal-content .form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.poll-modal-content .form-group textarea,
+.survey-modal-content .form-group textarea {
+  color: #1f2937;
+  background-color: #ffffff;
+  border: 2px solid #d1d5db;
+}
+
+.poll-modal-content .form-group textarea::placeholder,
+.survey-modal-content .form-group textarea::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
+.poll-modal-content .form-group textarea:focus,
+.survey-modal-content .form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.survey-edit-option-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.survey-edit-option-row input {
+  flex: 1;
+}
+
+.edit-poll-modal-content .candidate-fields input::placeholder,
+.edit-poll-modal-content .candidate-fields textarea::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
+.edit-poll-modal-content .candidate-fields input:focus,
+.edit-poll-modal-content .candidate-fields textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.survey-modal-content select option,
+.poll-modal-content select option,
+.edit-poll-modal-content select option {
+  color: #1f2937;
+  background-color: #ffffff;
+}
+
+.survey-modal-content select:focus,
+.poll-modal-content select:focus,
+.edit-poll-modal-content select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
 .btn-add-candidate {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
