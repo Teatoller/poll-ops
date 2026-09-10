@@ -1,5 +1,6 @@
 // src/components/Register.tsx
 import React, { useState, useEffect, useCallback } from 'react';
+import PasswordField from '../common/PasswordField';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import LocationSelector from './LocationSelector';
@@ -146,8 +147,7 @@ const Register: React.FC = () => {
 
           <div className="form-group">
             <label htmlFor="password">Password *</label>
-            <input
-              type="password"
+            <PasswordField
               id="password"
               name="password"
               value={formData.password}
@@ -161,8 +161,7 @@ const Register: React.FC = () => {
 
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm Password *</label>
-            <input
-              type="password"
+            <PasswordField
               id="confirmPassword"
               name="confirmPassword"
               value={formData.confirmPassword}
@@ -170,6 +169,7 @@ const Register: React.FC = () => {
               placeholder="Confirm password"
               className={errors.confirmPassword ? 'error' : ''}
               required
+              toggleAriaLabel="Show confirm password"
             />
             {errors.confirmPassword && (
               <span className="error-message">{errors.confirmPassword}</span>
