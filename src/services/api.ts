@@ -467,7 +467,17 @@ export const surveyAPI = {
   },
 
   // Admin: Update survey
-  updateSurvey: async (surveyId: number, surveyData: Partial<SurveyPoll>): Promise<SurveyPoll> => {
+  updateSurvey: async (surveyId: number, surveyData: {
+    question?: string;
+    description?: string;
+    startDate?: string;
+    endDate?: string;
+    scope?: SurveyPoll['scope'];
+    countyId?: number | null;
+    subCountyId?: number | null;
+    wardId?: number | null;
+    options?: Array<{ optionText: string }>;
+  }): Promise<SurveyPoll> => {
     return adminApiFetch(`/admin/surveys/${surveyId}`, {
       method: 'PUT',
       body: JSON.stringify(surveyData),

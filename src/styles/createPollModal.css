@@ -272,6 +272,16 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.survey-edit-option-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.survey-edit-option-row input {
+  flex: 1;
+}
+
 .edit-poll-modal-content .candidate-fields input::placeholder,
 .edit-poll-modal-content .candidate-fields textarea::placeholder {
   color: #6b7280;
