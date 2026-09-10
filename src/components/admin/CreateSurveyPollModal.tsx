@@ -1,6 +1,7 @@
 // src/components/admin/CreateSurveyPollModal.tsx
 import React, { useState } from 'react';
 import LocationSelector from '../client/LocationSelector';
+import '../../styles/createPollModal.css';
 
 interface SurveyOptionForm {
   optionText: string;
@@ -205,7 +206,7 @@ const CreateSurveyPollModal: React.FC<CreateSurveyPollModalProps> = ({ onClose, 
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content survey-modal-content">
         <div className="modal-header">
           <h3>Create New Survey/Opinion Poll</h3>
           <button 

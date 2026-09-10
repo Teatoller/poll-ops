@@ -1,6 +1,7 @@
 // src/components/admin/EditPollModal.tsx - FIXED VERSION
 import React, { useState, useEffect } from 'react';
 import LocationSelector from '../client/LocationSelector';
+import '../../styles/createPollModal.css';
 
 interface Candidate {
   id?: number;
@@ -231,7 +232,7 @@ const EditPollModal: React.FC<EditPollModalProps> = ({ poll, onClose, onSave }) 
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content edit-poll-modal-content">
         <div className="modal-header">
           <h3>Edit Poll #{poll.id}</h3>
           <button onClick={onClose} className="modal-close">×</button>

@@ -212,7 +212,7 @@ const CreatePollModal: React.FC<CreatePollModalProps> = ({ onClose, onSubmit }) 
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content poll-modal-content">
         <div className="modal-header">
           <h3>Create New Poll</h3>
           <button 
